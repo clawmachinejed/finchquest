@@ -1,0 +1,22 @@
+=== Dependency Check ===
+
+Runtime deps (required):
+✅ zod
+✅ firebase
+✅ firebase-admin
+
+Dev deps (required for lint/format/build):
+✅ tailwindcss
+✅ postcss
+✅ autoprefixer
+✅ prettier
+✅ prettier-plugin-tailwindcss
+✅ eslint
+✅ @typescript-eslint/parser
+✅ @typescript-eslint/eslint-plugin
+✅ eslint-config-next
+✅ eslint-config-prettier
+✅ eslint-plugin-import
+✅ eslint-plugin-tailwindcss
+
+🎉 All required packages are installed.

@@ -1,0 +1,231 @@
+// Firestore Security Rules
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // ========= Helpers =========
+    function authed() {
+      return request.auth != null;
+    }
+
+    // Existing docs: only the owner can read/write
+    function isOwner() {
+      return authed() && request.auth.uid == resource.data.userId;
+    }
+
+    // New docs: creator must set userId to themselves
+    function isOwnerNew() {
+      return authed() && request.resource.data.userId == request.auth.uid;
+    }
+
+    // Prevent changing userId on update
+    function preserveOwnerOnUpdate() {
+      return !request.resource.data.keys().hasAny(['userId']) ||
+             request.resource.data.userId == resource.data.userId;
+    }
+
+    // ---- type guards for optional fields (keep writes flexible) ----
+    function requireStringIfPresent(field) {
+      return !(request.resource.data.keys().hasAny([field])) ||
+             (request.resource.data[field] is string);
+    }
+    function requireNumberIfPresent(field) {
+      return !(request.resource.data.keys().hasAny([field])) ||
+             (request.resource.data[field] is number);
+    }
+    function requireBooleanIfPresent(field) {
+      return !(request.resource.data.keys().hasAny([field])) ||
+             (request.resource.data[field] is bool);
+    }
+    function requireTimestampOrNullIfPresent(field) {
+      return !(request.resource.data.keys().hasAny([field])) ||
+             (request.resource.data[field] == null || request.resource.data[field] is timestamp);
+    }
+    function requireListIfPresent(field) {
+      return !(request.resource.data.keys().hasAny([field])) ||
+             (request.resource.data[field] is list);
+    }
+    function validStatus() {
+      return !(request.resource.data.keys().hasAny(['status'])) ||
+             (request.resource.data.status in ['todo', 'doing', 'done', 'blocked']);
+    }
+
+    // ========= Collections =========
+
+    // ---- Domains (seeded/admin) ----
+    match /domains/{id} {
+      allow read: if authed();
+      allow create, update, delete: if false;
+    }
+
+    // ---- Profiles (id == uid) ----
+    match /profiles/{uid} {
+      allow read, update, delete: if authed() && request.auth.uid == uid;
+      allow create: if authed()
+                    && request.auth.uid == uid
+                    && request.resource.data.userId == uid;
+    }
+
+    // ---- Quests ----
+    // Fields: { userId, domainId, title, summary?, status?, priority?, dueDate?, createdAt, updatedAt }
+    match /quests/{id} {
+      allow read: if isOwner();
+
+      allow create: if isOwnerNew()
+                    && validStatus()
+                    && requireStringIfPresent('domainId')
+                    && requireStringIfPresent('title')
+                    && requireStringIfPresent('summary')
+                    && requireStringIfPresent('priority')
+                    && requireTimestampOrNullIfPresent('dueDate')
+                    && requireTimestampOrNullIfPresent('createdAt')
+                    && requireTimestampOrNullIfPresent('updatedAt');
+
+      allow update: if isOwner()
+                    && preserveOwnerOnUpdate()
+                    && validStatus()
+                    && requireStringIfPresent('domainId')
+                    && requireStringIfPresent('title')
+                    && requireStringIfPresent('summary')
+                    && requireStringIfPresent('priority')
+                    && requireTimestampOrNullIfPresent('dueDate')
+                    && requireTimestampOrNullIfPresent('createdAt')
+                    && requireTimestampOrNullIfPresent('updatedAt');
+
+      allow delete: if isOwner();
+    }
+
+    // ---- Chapters ----
+    // Fields: { userId, questId, title, summary?, status?, priority?, dueDate?, createdAt, updatedAt }
+    match /chapters/{id} {
+      allow read: if isOwner();
+
+      allow create: if isOwnerNew()
+                    && validStatus()
+                    && requireStringIfPresent('questId')
+                    && requireStringIfPresent('title')
+                    && requireStringIfPresent('summary')
+                    && requireStringIfPresent('priority')
+                    && requireTimestampOrNullIfPresent('dueDate')
+                    && requireTimestampOrNullIfPresent('createdAt')
+                    && requireTimestampOrNullIfPresent('updatedAt');
+
+      allow update: if isOwner()
+                    && preserveOwnerOnUpdate()
+                    && validStatus()
+                    && requireStringIfPresent('questId')
+                    && requireStringIfPresent('title')
+                    && requireStringIfPresent('summary')
+                    && requireStringIfPresent('priority')
+                    && requireTimestampOrNullIfPresent('dueDate')
+                    && requireTimestampOrNullIfPresent('createdAt')
+                    && requireTimestampOrNullIfPresent('updatedAt');
+
+      allow delete: if isOwner();
+    }
+
+    // ---- Tasks ----
+    // Fields: { userId, chapterId, questId?, title, notes?, status?, priority?, dueDate?, createdAt, updatedAt, ... }
+    match /tasks/{id} {
+      allow read: if isOwner();
+
+      allow create: if isOwnerNew()
+                    && validStatus()
+                    && requireStringIfPresent('chapterId')
+                    && requireStringIfPresent('questId')
+                    && requireStringIfPresent('title')
+                    && requireStringIfPresent('notes')
+                    && requireStringIfPresent('priority')
+                    && requireTimestampOrNullIfPresent('dueDate')
+                    && requireTimestampOrNullIfPresent('createdAt')
+                    && requireTimestampOrNullIfPresent('updatedAt');
+
+      allow update: if isOwner()
+                    && preserveOwnerOnUpdate()
+                    && validStatus()
+                    && requireStringIfPresent('chapterId')
+                    && requireStringIfPresent('questId')
+                    && requireStringIfPresent('title')
+                    && requireStringIfPresent('notes')
+                    && requireStringIfPresent('priority')
+                    && requireTimestampOrNullIfPresent('dueDate')
+                    && requireTimestampOrNullIfPresent('createdAt')
+                    && requireTimestampOrNullIfPresent('updatedAt');
+
+      allow delete: if isOwner();
+    }
+
+    // ---- Meetings (Plaud + AI) ----
+    // Typical fields:
+    // { userId, source, shareUrl, shareUrlExpiresAt?, title, occurredAt, createdAt,
+    //   plaudSummary?, aiSummary?, summaryModel?, attachments[], processingStatus?,
+    //   aiRunHash?, aiRunId?, lastAiRunAt?,
+    //   domainKey?, domainConfidence?, questId?, questConfidence?, questMatchMethod?,
+    //   chapterId?, chapterConfidence?, chapterMatchMethod?, meta? }
+    match /meetings/{id} {
+      allow read: if isOwner();
+
+      allow create: if isOwnerNew()
+                    && requireStringIfPresent('source')
+                    && requireStringIfPresent('shareUrl')
+                    && requireStringIfPresent('title')
+                    && requireStringIfPresent('plaudSummary')
+                    && requireStringIfPresent('aiSummary')
+                    && requireStringIfPresent('summaryModel')
+                    && requireStringIfPresent('processingStatus')
+                    && requireStringIfPresent('domainKey')
+                    && requireStringIfPresent('questId')
+                    && requireStringIfPresent('chapterId')
+                    && requireNumberIfPresent('domainConfidence')
+                    && requireNumberIfPresent('questConfidence')
+                    && requireNumberIfPresent('chapterConfidence')
+                    && requireStringIfPresent('questMatchMethod')
+                    && requireStringIfPresent('chapterMatchMethod')
+                    && requireStringIfPresent('aiRunHash')
+                    && requireStringIfPresent('aiRunId')
+                    && requireTimestampOrNullIfPresent('lastAiRunAt')
+                    && requireTimestampOrNullIfPresent('shareUrlExpiresAt')
+                    && requireTimestampOrNullIfPresent('occurredAt')
+                    && requireTimestampOrNullIfPresent('createdAt')
+                    && requireListIfPresent('attachments'); // allow list; element validation is intentionally loose
+
+      allow update: if isOwner()
+                    && preserveOwnerOnUpdate()
+                    && requireStringIfPresent('source')
+                    && requireStringIfPresent('shareUrl')
+                    && requireStringIfPresent('title')
+                    && requireStringIfPresent('plaudSummary')
+                    && requireStringIfPresent('aiSummary')
+                    && requireStringIfPresent('summaryModel')
+                    && requireStringIfPresent('processingStatus')
+                    && requireStringIfPresent('domainKey')
+                    && requireStringIfPresent('questId')
+                    && requireStringIfPresent('chapterId')
+                    && requireNumberIfPresent('domainConfidence')
+                    && requireNumberIfPresent('questConfidence')
+                    && requireNumberIfPresent('chapterConfidence')
+                    && requireStringIfPresent('questMatchMethod')
+                    && requireStringIfPresent('chapterMatchMethod')
+                    && requireStringIfPresent('aiRunHash')
+                    && requireStringIfPresent('aiRunId')
+                    && requireTimestampOrNullIfPresent('lastAiRunAt')
+                    && requireTimestampOrNullIfPresent('shareUrlExpiresAt')
+                    && requireTimestampOrNullIfPresent('occurredAt')
+                    && requireTimestampOrNullIfPresent('createdAt')
+                    && requireListIfPresent('attachments');
+
+      allow delete: if isOwner();
+    }
+
+    // ---- User Settings (automation thresholds, etc.) ----
+    match /users/{uid}/settings/{doc} {
+      allow read, write: if authed() && request.auth.uid == uid;
+    }
+
+    // ---- Aliases (domain-scoped) ----
+    // /users/{uid}/aliases/{domainKey}/entries/{aliasId}
+    match /users/{uid}/aliases/{domainKey}/entries/{aliasId} {
+      allow read, write: if authed() && request.auth.uid == uid;
+    }
+  }
+}

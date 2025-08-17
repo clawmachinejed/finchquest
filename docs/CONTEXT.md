@@ -1,45 +1,73 @@
-Project: Finch Quest
+Product & Scope
 
-Theme & hierarchy:
-- Domains (top level):
-  - Guild Missions (Career)
-  - The Keep (Family/Home)
-  - Side Quests (Personal)
-  - The Forge (Self)
-- Within a Domain:
-  - Quest → Chapter → Encounter (Task)
+Goal: track goals (“quests”) inside domains with nested chapters and tasks.
 
-Current stack:
-- Next.js 15 (App Router, TypeScript, Tailwind)
-- Firebase Web SDK + Firestore (client)
-- Firebase Admin SDK (server routes)
-- Absolute imports via @ alias
-- Auth: Firebase Email/Password + Google
+Stack: Next.js 15 (App Router) + TypeScript + Tailwind, Firebase (Auth, Firestore), hosted on Vercel.
 
-Data model (current):
-- Firestore collections:
-  - domains (seeded via Admin; client read-only)
-  - epics (UI name: “quests”)
-    - fields: { userId, domainId, title, summary, status, dueDate, createdAt, updatedAt }
+Data ownership: single-user scope (no org multi-tenant); every document includes userId and reads/writes are restricted to owner via rules.
 
-Routes & components:
-- /domain — lists live Domains (links to /quests?domain=<id>)
-- /quests — shows “epics” filtered by ?domain=; create form defaults to that domain
-- Protected wrapper: src/components/auth/Protected.tsx
-- Hook: src/lib/useDomains.ts
-- Firebase init: src/lib/firebase.client.ts, src/lib/firebase.admin.ts
-- Seed endpoint: src/app/api/seed-domains/route.ts
+Design Philosophy
 
-Rules (summary):
-- domains readable (authed), no client writes
-- CRUD collections gated by userId; status validation; userId immutable on update
+Mobile-first, minimal friction. Actions must be doable from a phone.
 
-Env:
-- .env.local has NEXT_PUBLIC_* (client) and FIREBASE_* (admin) vars
-- FIREBASE_PRIVATE_KEY is quoted and keeps \n newlines
+Simple, explicit hierarchy: Domain → Quests → Chapters → Tasks.
 
-Outstanding next steps:
-1) Build Chapters (under Quest) and Encounters (under Chapter)
-2) “Today” view (Encounters due today) + status/due filters
-3) Plaud → GPT → Action Items webhook
-4) Deploy to Vercel and connect Porkbun domain
+Real-time: use Firestore listeners for lists and detail views where UX benefits.
+
+Predictable URLs & params: preserve ?domain= across navigation when appropriate.
+
+Consistent theming: token-based, layered Tailwind variants for cards/rows.
+
+Auth first: signed-in users land on /domain (not legacy /epics).
+
+Core Navigation Rules
+
+Global param domain filters context (e.g., /quests?domain=forge).
+
+LinkWithParams:
+- carry: which params to preserve (e.g., carry domain across sections).
+- Use to avoid stale params when switching to pages where param no longer applies.
+
+AppSidebar: quick nav to Domains + “Explore” domain presets (guild, keep, forge, side) highlighting active domain.
+
+AppTopbar: breadcrumbs + mobile drawer; quick “+ Add” entry point (quests).
+
+Protected.tsx gates all routes under (app) and redirects to /domain after sign-in.
+
+Process Loop (Plan → Do → Learn → Decide)
+
+Plan: Create Quests inside a Domain, outline Chapters, seed Tasks.
+Do: Mark task progress.
+Learn: Review task outcomes.
+Decide: Reassign/prioritize tasks.
+
+What Exists Today (User-visible)
+
+Domains: /domain lists all user domains with links into filtered quests.
+Quests: /quests?domain={alias} shows quests in a domain; create/edit quests.
+Chapters: /chapters?questId={id}; create/edit chapters.
+Tasks: basic CRUD; status enum: todo | doing | done | blocked.
+
+Auth: redirects to /domain on sign-in; per-user Firestore security enforced.
+
+Backend & Infra (Project state)
+
+Firestore Rules (deployed):
+- Collections: domains (read-only seeded), profiles, quests, chapters, tasks, users/{uid}/settings, users/{uid}/aliases/{domainKey}/entries.
+- Owner-only read/write; userId must match request.auth.uid; timestamp and type guard helpers.
+
+Environment:
+- .env.local includes public Web SDK config and Admin SDK creds.
+- .firebaserc set to finch-quest.
+- firebase.json maps firestore.rules, firestore.indexes.json.
+
+[CHANGED]
+- Meetings removed.
+- “Epics” fully replaced by Quests.
+
+[PLANNED] (near-term)
+- Polish CRUD flows for quests/chapters/tasks.
+- Add list empty states, toasts, optimistic updates.
+
+Removed Features
+- Meetings, Plaud links, and scraping helpers removed until later phase.

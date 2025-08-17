@@ -1,0 +1,16 @@
+// storage.rules
+rules_version = '2';
+service firebase.storage {
+  match /b/{bucket}/o {
+    // Only the owner can read/write their meeting files
+    // e.g. /users/{uid}/meetings/{meetingId}/transcript.txt
+    match /users/{uid}/meetings/{meetingId}/{allPaths=**} {
+      allow read, write: if request.auth != null && request.auth.uid == uid;
+    }
+
+    // Deny everything else
+    match /{path=**} {
+      allow read, write: if false;
+    }
+  }
+}

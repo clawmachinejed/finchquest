@@ -1,16 +1,24 @@
-Now
-- [ ] Chapters page: create/list chapters by quest; status/due fields
-- [ ] Encounters page: create/list encounters by chapter; status/due fields
-- [x] /quests reads ?domain= and defaults create dropdown
-- [x] /domain lists domains with links to /quests?domain=
+Roadmap (Meeting-Free Phase)
 
-Next
-- [ ] “Today” view (all Encounters due today, grouped by Domain)
-- [ ] Status/due filters and quick actions
-- [ ] Webhook: /api/plaud/webhook -> OpenAI extract -> write encounters
-- [ ] Deploy to Vercel and connect Porkbun DNS
-- [ ] Onboarding step: choose default Domain
+MVP (current phase)
+- Domains: CRUD complete (list, filter).
+- Quests: CRUD, domain-scoped.
+- Chapters: CRUD, quest-scoped.
+- Tasks: CRUD, status enum, quest/chapter-scoped.
+- Auth: Firebase Auth, Protected routes.
+- Navigation: sidebar, topbar, breadcrumbs, param carry.
 
-Later
-- [ ] Optional migration: rename collections epics→quests, features→chapters, stories→encounters
-- [ ] Sharing/roles
+Near-Term
+- UX polish: loading states, empty placeholders, toasts.
+- Optimistic UI updates for create/edit/delete.
+- Improve form validation + type safety.
+
+Future (post-MVP)
+- Meeting system re-introduction (drawer, AI summary, transcripts).
+- API routes for meeting ingest and classification.
+- File uploads (transcripts, docs).
+- Cross-domain analytics.
+
+Removed / Deferred
+- Meeting Drawer and related API routes.
+- Plaud 7-day link ingestion.
