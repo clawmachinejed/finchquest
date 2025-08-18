@@ -1,8 +1,9 @@
 'use client'
 
+import Link from 'next/link'
+
 import { useAuth } from '@/app/providers/AuthProvider'
 import { useTasksAll } from '@/lib/useTasksAll'
-import Link from 'next/link'
 
 function isToday(millis: number) {
   const d = new Date(millis)
@@ -40,7 +41,7 @@ export default function TodayPage() {
           ) : (
             <ul>
               {overdue.map(t => (
-                <li key={t.id} className="flex items-center justify-between border-b/10 p-3">
+                <li key={t.id} className="border-b/10 flex items-center justify-between p-3">
                   <span>{t.title}</span>
                   <Link href={`/tasks?chapter=${t.chapterId}`} className="text-sm underline">
                     Open
@@ -60,7 +61,7 @@ export default function TodayPage() {
           ) : (
             <ul>
               {dueToday.map(t => (
-                <li key={t.id} className="flex items-center justify-between border-b/10 p-3">
+                <li key={t.id} className="border-b/10 flex items-center justify-between p-3">
                   <span>{t.title}</span>
                   <Link href={`/tasks?chapter=${t.chapterId}`} className="text-sm underline">
                     Open

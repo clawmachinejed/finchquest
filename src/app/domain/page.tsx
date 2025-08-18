@@ -1,5 +1,6 @@
 'use client'
 import Link from 'next/link'
+
 import { useDomains } from '@/lib/useDomains'
 
 export default function DomainsPage() {
@@ -9,16 +10,16 @@ export default function DomainsPage() {
   if (error) return <main className="p-6 text-red-600">Error: {error}</main>
 
   return (
-    <main className="p-6 space-y-6">
+    <main className="space-y-6 p-6">
       <h1 className="text-2xl font-semibold">Domains</h1>
 
-      <ul className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
+      <ul className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
         {domains.map((d) => (
-          <li key={d.id} className="border rounded-xl p-4 hover:shadow transition">
-            <div className="text-lg font-medium mb-2">{d.name}</div>
+          <li key={d.id} className="rounded-xl border p-4 transition hover:shadow">
+            <div className="mb-2 text-lg font-medium">{d.name}</div>
             <Link
               href={`/quests?domain=${d.id}`}
-              className="inline-block border px-3 py-1 rounded"
+              className="inline-block rounded border px-3 py-1"
             >
               View Quests →
             </Link>

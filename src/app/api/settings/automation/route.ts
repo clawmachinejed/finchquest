@@ -1,8 +1,9 @@
 // src/app/api/settings/automation/route.ts
 import type { NextRequest } from "next/server";
 import { NextResponse } from "next/server";
-import { AdminDb } from "@/lib/firebase.admin";
 import { z } from "zod";
+
+import { AdminDb } from "@/lib/firebase.admin";
 
 // Body schema (extend as needed)
 const AutomationSchema = z.object({

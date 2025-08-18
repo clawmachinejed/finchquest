@@ -1,6 +1,5 @@
 'use client';
 
-import { env } from '@/env';
 import {
   initializeApp,
   getApps,
@@ -19,6 +18,8 @@ import {
   getFirestore,
   type Firestore,
 } from 'firebase/firestore';
+
+import { env } from '@/env';
 
 // ---- App singleton ----------------------------------------------------------
 

@@ -1,8 +1,8 @@
 'use client'
-import * as React from "react";
-
-import { useEffect } from 'react'
 import { useRouter } from 'next/navigation'
+import * as React from "react";
+import { useEffect } from 'react'
+
 import { useAuth } from '@/app/providers/AuthProvider'
 
 export default function Protected({ children }: { children: React.ReactNode }) {

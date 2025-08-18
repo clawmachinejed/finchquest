@@ -1,5 +1,6 @@
 import * as React from 'react';
 import type { ReactNode } from 'react';
+
 import Protected from '@/components/auth/Protected';
 import AppShell from '@/components/nav/AppShell';
 

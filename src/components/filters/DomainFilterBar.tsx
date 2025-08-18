@@ -61,7 +61,7 @@ export default function DomainFilterBar() {
   }
 
   return (
-    <div className="sticky top-0 z-10 -mx-4 mb-3 border-b border-white/10 bg-background/80 px-4 py-2 backdrop-blur">
+    <div className="bg-background/80 sticky top-0 z-10 -mx-4 mb-3 border-b border-white/10 px-4 py-2 backdrop-blur">
       <div className="flex flex-wrap items-center gap-2">
         {/* All Quests pill */}
         <button

@@ -2,6 +2,7 @@
 'use client';
 
 import type { PropsWithChildren } from 'react';
+
 import AppSidebar from '@/components/nav/AppSidebar';
 import AppTopbar from '@/components/nav/AppTopbar';
 

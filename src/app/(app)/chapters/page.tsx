@@ -1,19 +1,19 @@
 // src/app/(app)/chapters/page.tsx
 'use client';
 export const dynamic = 'force-dynamic';
-import { useEffect, useMemo, useState } from 'react';
+import { collection, doc, getDoc, getDocs, orderBy, query, where } from 'firebase/firestore';
 import Link from 'next/link';
 import { useSearchParams, useRouter } from 'next/navigation';
-import { collection, doc, getDoc, getDocs, orderBy, query, where } from 'firebase/firestore';
-import type { Task, Chapter, Quest as QuestModel } from '@/types/models';
+import { useEffect, useMemo, useState } from 'react';
 
-import Protected from '@/components/auth/Protected';
 import { useAuth } from '@/app/providers/AuthProvider';
-import { getDb } from '@/lib/firebase.client';
-import ChapterEditModal from '@/components/modals/ChapterEditModal';
+import Protected from '@/components/auth/Protected';
 import ChapterCreateModal from '@/components/modals/ChapterCreateModal';
-import TaskEditModal from '@/components/modals/TaskEditModal';
+import ChapterEditModal from '@/components/modals/ChapterEditModal';
 import TaskCreateModal from '@/components/modals/TaskCreateModal';
+import TaskEditModal from '@/components/modals/TaskEditModal';
+import { getDb } from '@/lib/firebase.client';
+import type { Task, Chapter, Quest as QuestModel } from '@/types/models';
 
 const db = getDb();
 
@@ -121,7 +121,7 @@ function ChaptersInner() {
       </div>
 
       <h1 className="mb-1 text-2xl font-bold text-white">{quest ? quest.title : '—'}</h1>
-      <div className="mb-6 flex items-center justify_between">
+      <div className="justify_between mb-6 flex items-center">
         <h2 className="text-lg font-semibold text-zinc-200">Chapters</h2>
         <div className="flex items-center gap-2">
           <button

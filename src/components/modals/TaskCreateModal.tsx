@@ -1,9 +1,4 @@
 'use client';
-import * as React from "react";
-
-
-import { useEffect, useState } from 'react';
-import Modal from '@/components/ui/Modal';
 import {
   Timestamp,
   addDoc,
@@ -12,8 +7,12 @@ import {
   getDoc,
   serverTimestamp,
 } from 'firebase/firestore';
-import { db } from '@/lib/firebase.client';
+import * as React from "react";
+import { useEffect, useState } from 'react';
+
 import { useAuth } from '@/app/providers/AuthProvider';
+import Modal from '@/components/ui/Modal';
+import { db } from '@/lib/firebase.client';
 
 type Domain = { id: string; name: string };
 type Quest = { id: string; title: string; domainId?: string };

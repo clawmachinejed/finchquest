@@ -1,11 +1,12 @@
 // src/components/nav/Breadcrumbs.tsx
 'use client'
 
-import { useEffect, useState } from 'react'
+import { doc, getDoc } from 'firebase/firestore'
 import { useSearchParams } from 'next/navigation'
+import { useEffect, useState } from 'react'
+
 import LinkWithParams from '@/components/nav/LinkWithParams'
 import { db } from '@/lib/firebase.client'
-import { doc, getDoc } from 'firebase/firestore'
 import { useDomains } from '@/lib/useDomains'
 
 /**

@@ -1,5 +1,6 @@
-import { db } from '@/lib/firebase.client';
 import { collection, getDocs } from 'firebase/firestore';
+
+import { db } from '@/lib/firebase.client';
 
 export type MatchMethod = 'exact' | 'alias' | 'fuzzy' | 'model';
 

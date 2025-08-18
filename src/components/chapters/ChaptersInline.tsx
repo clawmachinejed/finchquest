@@ -1,8 +1,8 @@
 // src/components/chapters/ChaptersInline.tsx
 'use client'
 import * as React from "react";
-
 import { useState } from 'react'
+
 import { useChapters } from '@/lib/useChapters'
 
 export default function ChaptersInline(props: {

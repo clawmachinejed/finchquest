@@ -1,7 +1,8 @@
 'use client';
 
-import LinkWithParams from '@/components/nav/LinkWithParams';
 import { useSearchParams } from 'next/navigation';
+
+import LinkWithParams from '@/components/nav/LinkWithParams';
 
 export default function AppSidebar() {
   const sp = useSearchParams();

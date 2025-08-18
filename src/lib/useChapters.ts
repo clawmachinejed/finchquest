@@ -1,7 +1,6 @@
 // src/lib/useChapters.ts
 'use client'
 
-import { useEffect, useMemo, useState } from 'react'
 import {
   addDoc,
   collection,
@@ -16,6 +15,8 @@ import {
   where,
   getFirestore,
 } from 'firebase/firestore'
+import { useEffect, useMemo, useState } from 'react'
+
 import { db } from '@/lib/firebase.client'
 import type { Chapter, Status } from '@/lib/types'
 

@@ -1,7 +1,8 @@
 'use client'
-import { useEffect, useState } from 'react'
-import { db } from '@/lib/firebase.client'
 import { collection, onSnapshot, orderBy, query } from 'firebase/firestore'
+import { useEffect, useState } from 'react'
+
+import { db } from '@/lib/firebase.client'
 
 export type Domain = { id: string; name: string }
 

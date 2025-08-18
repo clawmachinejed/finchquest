@@ -2,20 +2,20 @@
 'use client';
 export const dynamic = 'force-dynamic';
 
-import { useEffect, useMemo, useState } from 'react';
-import Link from 'next/link';
-import { useSearchParams } from 'next/navigation';
 
 import { collection, getDocs, orderBy, query, where } from 'firebase/firestore';
 import type { QueryConstraint } from 'firebase/firestore';
+import Link from 'next/link';
+import { useSearchParams } from 'next/navigation';
+import { useEffect, useMemo, useState } from 'react';
 
-import type { Quest as QuestModel, Chapter as ChapterModel } from '@/types/models';
-import { getDb } from '@/lib/firebase.client';
-import Protected from '@/components/auth/Protected';
 import { useAuth } from '@/app/providers/AuthProvider';
-import QuestEditModal from '@/components/modals/QuestEditModal';
-import QuestCreateModal from '@/components/modals/QuestCreateModal';
+import Protected from '@/components/auth/Protected';
 import DomainFilterBar from '@/components/filters/DomainFilterBar';
+import QuestCreateModal from '@/components/modals/QuestCreateModal';
+import QuestEditModal from '@/components/modals/QuestEditModal';
+import { getDb } from '@/lib/firebase.client';
+import type { Quest as QuestModel, Chapter as ChapterModel } from '@/types/models';
 
 // add this line just below the imports:
 const db = getDb();
@@ -140,7 +140,7 @@ function QuestsInner() {
       : `Filtered: ${selectedDomains.join(', ')}`;
 
   return (
-    <div className="mx-auto w_full max-w-3xl px-4 py-6 sm:py-8">
+    <div className="w_full mx-auto max-w-3xl px-4 py-6 sm:py-8">
       <div className="mb-2 flex items-center justify-between">
         <h1 className="text-2xl font-bold text-white">Quests</h1>
         <div className="flex items-center gap-2">
@@ -176,7 +176,7 @@ function QuestsInner() {
                       quest: qst.id,
                       ...(selectedDomains.length === 1 ? { domain: selectedDomains[0] } : {}),
                     }).toString()}`}
-                    className="block truncate text-base font-medium text_white hover:underline"
+                    className="text_white block truncate text-base font-medium hover:underline"
                     title={qst.title}
                   >
                     {qst.title}

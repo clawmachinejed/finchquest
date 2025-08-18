@@ -1,10 +1,9 @@
 'use client'
 import * as React from "react";
-
-
 import { useState } from 'react'
-import type { Chapter, Status } from '@/lib/types'
+
 import TasksInline from '@/components/tasks/TasksInline'
+import type { Chapter, Status } from '@/lib/types'
 
 export default function ChapterList(props: {
   chapters: Chapter[]

@@ -1,11 +1,13 @@
 // src/lib/useTasksAll.ts
 'use client'
 
-import { useEffect, useState } from 'react'
 import { collection, onSnapshot, query, where, orderBy } from 'firebase/firestore'
+import { type Timestamp } from 'firebase/firestore'
+import { useEffect, useState } from 'react'
+
 import { db } from '@/lib/firebase.client'
 import type { Task } from '@/lib/useTasks'
-import { Timestamp } from 'firebase/firestore'
+
 
 function tsToMillis(ts?: Timestamp | null) {
   return ts ? ts.toMillis() : null

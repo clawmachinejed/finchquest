@@ -1,15 +1,15 @@
 'use client';
 
-import { useEffect, useMemo, useState } from 'react';
+import { collection, doc, getDoc, getDocs, orderBy, query, where } from 'firebase/firestore';
 import Link from 'next/link';
 import { useSearchParams, useRouter } from 'next/navigation';
-import { collection, doc, getDoc, getDocs, orderBy, query, where } from 'firebase/firestore';
+import { useEffect, useMemo, useState } from 'react';
 
-import Protected from '@/components/auth/Protected';
 import { useAuth } from '@/app/providers/AuthProvider';
-import { db } from '@/lib/firebase.client';
-import TaskEditModal from '@/components/modals/TaskEditModal';
+import Protected from '@/components/auth/Protected';
 import TaskCreateModal from '@/components/modals/TaskCreateModal';
+import TaskEditModal from '@/components/modals/TaskEditModal';
+import { db } from '@/lib/firebase.client';
 
 type Quest = { id: string; title: string; summary?: string; domainId?: string };
 type Chapter = { id: string; title: string; summary?: string; questId?: string };
@@ -100,7 +100,7 @@ function TasksInner() {
     }
   };
 
-  useEffect(() => { reload(); /* eslint-disable-next-line */ }, [user, chapterId]);
+  useEffect(() => { reload();   }, [user, chapterId]);
 
   return (
     <div className="mx-auto w-full max-w-3xl px-4 py-6 sm:py-8">

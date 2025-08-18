@@ -1,8 +1,9 @@
 // src/app/providers/AuthProvider.tsx
 'use client';
 
-import { createContext, useContext, useEffect, useMemo, useState, type ReactNode } from 'react';
 import type { User } from 'firebase/auth';
+import { createContext, useContext, useEffect, useMemo, useState, type ReactNode } from 'react';
+
 import { getAuthClient, onAuthChanged } from '@/lib/firebase.client';
 
 type AuthContextValue = {

@@ -1,4 +1,5 @@
 import { addDoc, collection, serverTimestamp } from 'firebase/firestore';
+
 import { db } from '@/lib/firebase.client';
 
 export function withCreateTimestamps<T extends object>(data: T) {
