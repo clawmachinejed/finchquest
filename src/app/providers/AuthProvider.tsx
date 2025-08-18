@@ -2,74 +2,43 @@
 'use client';
 
 import * as React from 'react';
+import type { ReactNode } from 'react';
+import { onAuthStateChanged, type User as FirebaseUser } from 'firebase/auth';
+import { getAuthClient } from '@/lib/firebase.client';
 
-type FirebaseUser = import('firebase/auth').User | null;
-
+// Context shape
 type AuthContextValue = {
-  user: FirebaseUser;
+  user: FirebaseUser | null;
   loading: boolean;
-  signInWithGoogle: () => Promise<void>;
-  signOut: () => Promise<void>;
 };
 
-const AuthContext = React.createContext<AuthContextValue>({
-  user: null,
-  loading: true,
-  signInWithGoogle: async () => {},
-  signOut: async () => {},
-});
+// Create context
+const AuthContext = React.createContext<AuthContextValue | undefined>(undefined);
 
-export default function AuthProvider({ children }: { children: React.ReactNode }) {
-  const [user, setUser] = React.useState<FirebaseUser>(null);
+// Named export: Provider component (used in app/layout.tsx)
+export function AuthProvider({ children }: { children: ReactNode }) {
+  const [user, setUser] = React.useState<FirebaseUser | null>(null);
   const [loading, setLoading] = React.useState(true);
 
-  // Subscribe to auth state on the CLIENT only; never import Firebase on the server.
   React.useEffect(() => {
-    if (typeof window === 'undefined') return;
-
-    let unsubscribe: (() => void) | undefined;
-
-    (async () => {
-      const [{ getAuth, onAuthStateChanged }, { app }] = await Promise.all([
-        import('firebase/auth'),
-        import('@/lib/firebase.client'),
-      ]);
-
-      const auth = getAuth(app);
-      unsubscribe = onAuthStateChanged(auth, (u) => {
-        setUser(u);
-        setLoading(false);
-      });
-    })();
-
-    return () => {
-      if (unsubscribe) unsubscribe();
-    };
+    const auth = getAuthClient();
+    const unsub = onAuthStateChanged(auth, (u) => {
+      setUser(u);
+      setLoading(false);
+    });
+    return unsub;
   }, []);
 
-  const signInWithGoogle = React.useCallback(async () => {
-    const [{ getAuth, GoogleAuthProvider, signInWithPopup }, { app }] = await Promise.all([
-      import('firebase/auth'),
-      import('@/lib/firebase.client'),
-    ]);
-    const auth = getAuth(app);
-    await signInWithPopup(auth, new GoogleAuthProvider());
-  }, []);
-
-  const signOut = React.useCallback(async () => {
-    const [{ getAuth, signOut }, { app }] = await Promise.all([
-      import('firebase/auth'),
-      import('@/lib/firebase.client'),
-    ]);
-    await signOut(getAuth(app));
-  }, []);
-
-  const value = React.useMemo<AuthContextValue>(
-    () => ({ user, loading, signInWithGoogle, signOut }),
-    [user, loading, signInWithGoogle, signOut]
-  );
+  const value = React.useMemo(() => ({ user, loading }), [user, loading]);
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 }
 
-export const useAuth = () => React.useContext(AuthContext);
+// Default export: hook (so pages can `import useAuth from ...`)
+export default function useAuth(): AuthContextValue {
+  const ctx = React.useContext(AuthContext);
+  if (!ctx) {
+    throw new Error('useAuth must be used within <AuthProvider>');
+  }
+  return ctx;
+}

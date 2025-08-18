@@ -1,6 +1,7 @@
 ﻿// src/app/(app)/quests/page.tsx
 'use client';
 export const dynamic = 'force-dynamic';
+
 import { useEffect, useMemo, useState } from 'react';
 import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
@@ -10,14 +11,15 @@ import {
   orderBy,
   query,
   where,
-  QueryConstraint,
 } from 'firebase/firestore';
+import type { QueryConstraint } from 'firebase/firestore';
 import { db } from '@/lib/firebase.client';
 import Protected from '@/components/auth/Protected';
 import { useAuth } from '@/app/providers/AuthProvider';
 import QuestEditModal from '@/components/modals/QuestEditModal';
 import QuestCreateModal from '@/components/modals/QuestCreateModal';
 import DomainFilterBar from '@/components/filters/DomainFilterBar';
+import type { Quest, Chapter } from '@/types/models';
 
 // simple date formatter (accepts Firestore Timestamp or Date/string)
 const fmtDate = (v: any) => {
@@ -180,15 +182,16 @@ function QuestsInner() {
                   >
                     {qst.title}
                   </Link>
-                  {qst.summary && (
-                    <p className="mt-1 line-clamp-2 text-sm text-zinc-400">{qst.summary}</p>
+                  {/* summary/status/priority/due shown if present on the doc */}
+                  {(qst as any).summary && (
+                    <p className="mt-1 line-clamp-2 text-sm text-zinc-400">{(qst as any).summary}</p>
                   )}
                   <div className="mt-2 text-xs text-zinc-500">
-                    {qst.status ? <>Status: {qst.status}</> : null}
-                    {qst.priority ? <>{qst.status ? ' · ' : ''}Priority: {qst.priority}</> : null}
+                    {(qst as any).status ? <>Status: {(qst as any).status}</> : null}
+                    {(qst as any).priority ? <>{(qst as any).status ? ' · ' : ''}Priority: {(qst as any).priority}</> : null}
                     {fmtDate((qst as any).dueDate) ? (
                       <>
-                        {(qst.status || qst.priority) ? ' · ' : ''}Due: {fmtDate((qst as any).dueDate)}
+                        {((qst as any).status || (qst as any).priority) ? ' · ' : ''}Due: {fmtDate((qst as any).dueDate)}
                       </>
                     ) : null}
                   </div>
@@ -219,8 +222,8 @@ function QuestsInner() {
                           • {ch.title}
                         </Link>
                         <span className="ml-3 shrink-0 text-xs text-zinc-500">
-                          {ch.status || ''}
-                          {ch.priority ? (ch.status ? ' · ' : '') + `prio: ${ch.priority}` : ''}
+                          {(ch as any).status || ''}
+                          {(ch as any).priority ? ((ch as any).status ? ' · ' : '') + `prio: ${(ch as any).priority}` : ''}
                         </span>
                       </li>
                     ))}

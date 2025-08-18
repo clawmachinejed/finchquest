@@ -1,6 +1,7 @@
 ﻿// src/app/(app)/chapters/page.tsx
 'use client';
 export const dynamic = 'force-dynamic';
+
 import { useEffect, useMemo, useState } from 'react';
 import Link from 'next/link';
 import { useSearchParams, useRouter } from 'next/navigation';
@@ -15,7 +16,7 @@ import ChapterCreateModal from '@/components/modals/ChapterCreateModal';
 import TaskEditModal from '@/components/modals/TaskEditModal';
 import TaskCreateModal from '@/components/modals/TaskCreateModal';
 
-type Quest = { id: string; title: string; summary?: string };
+// (removed the local `type Quest = { ... }`)
 
 export default function ChaptersPage() {
   return (
@@ -62,7 +63,8 @@ function ChaptersInner() {
         return;
       }
       const qd = questSnap.data() as Quest;
-      setQuest({ id: questSnap.id, title: (qd as any).title, summary: (qd as any).summary });
+      // include all fields from Firestore so required props (e.g., domainId) are present
+      setQuest({ id: questSnap.id, ...(qd as any) } as Quest);
 
       const qCh = query(
         collection(db, 'chapters'),
@@ -96,7 +98,7 @@ function ChaptersInner() {
 
   useEffect(() => {
     reload();
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user, questId]);
 
   const tasksHref = (chapterId: string) => {
@@ -150,12 +152,12 @@ function ChaptersInner() {
                     {c.title}
                   </Link>
 
-                  {c.summary && (
-                    <p className="mt-1 line-clamp-2 text-sm text-zinc-400">{c.summary}</p>
+                  {(c as any).summary && (
+                    <p className="mt-1 line-clamp-2 text-sm text-zinc-400">{(c as any).summary}</p>
                   )}
                   <div className="mt-2 text-xs text-zinc-500">
-                    {c.status ? <>Status: {c.status}</> : null}
-                    {c.priority ? <>{c.status ? ' · ' : ''}Priority: {c.priority}</> : null}
+                    {(c as any).status ? <>Status: {(c as any).status}</> : null}
+                    {(c as any).priority ? <>{(c as any).status ? ' · ' : ''}Priority: {(c as any).priority}</> : null}
                   </div>
                 </div>
 
@@ -181,8 +183,8 @@ function ChaptersInner() {
                           • {t.title}
                         </div>
                         <div className="ml-3 shrink-0 text-xs text-zinc-500">
-                          {t.status || ''}
-                          {t.priority ? (t.status ? ' · ' : '') + `prio: ${t.priority}` : ''}
+                          {(t as any).status || ''}
+                          {(t as any).priority ? ((t as any).status ? ' · ' : '') + `prio: ${(t as any).priority}` : ''}
                         </div>
                       </li>
                     ))}
