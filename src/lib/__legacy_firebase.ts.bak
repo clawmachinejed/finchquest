@@ -1,0 +1,5 @@
+'use client';
+
+// Compatibility shim so legacy imports like `@/lib/firebase` remain client-only.
+// It simply re-exports the safe client entry we maintain below.
+export * from './firebase.client';

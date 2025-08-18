@@ -1,16 +1,14 @@
-// src/app/layout.tsx
-import type { ReactNode } from "react";
-import "./globals.css";
+import './globals.css';
+import * as React from 'react';
+import type { ReactNode } from 'react';
+import AuthProvider from './providers/AuthProvider';
 
-/**
- * RootLayout is a Server Component by default.
- * Keep it free of client-only code (no useEffect, no dynamic ssr:false).
- * Auth gating happens inside src/app/(app)/layout.tsx.
- */
 export default function RootLayout({ children }: { children: ReactNode }) {
   return (
     <html lang="en">
-      <body>{children}</body>
+      <body>
+        <AuthProvider>{children}</AuthProvider>
+      </body>
     </html>
   );
 }

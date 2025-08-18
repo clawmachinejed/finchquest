@@ -1,4 +1,4 @@
-﻿// src/app/api/seed-domains/route.ts
+// src/app/api/seed-domains/route.ts
 import { NextResponse } from "next/server";
 import { AdminDb } from "@/lib/firebase.admin";
 

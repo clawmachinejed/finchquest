@@ -1,30 +1,75 @@
+// src/app/providers/AuthProvider.tsx
 'use client';
 
-import type { ReactNode } from 'react';
-import { createContext, useContext, useEffect, useState } from 'react';
-import { onAuthStateChanged, type User } from 'firebase/auth';
-import { auth } from '@/lib/firebase.client';
+import * as React from 'react';
 
-type AuthCtxValue = { user: User | null; loading: boolean };
+type FirebaseUser = import('firebase/auth').User | null;
 
-const AuthCtx = createContext<AuthCtxValue>({ user: null, loading: true });
-export const useAuth = () => useContext(AuthCtx);
+type AuthContextValue = {
+  user: FirebaseUser;
+  loading: boolean;
+  signInWithGoogle: () => Promise<void>;
+  signOut: () => Promise<void>;
+};
 
-/**
- * AuthProvider
- * Subscribes to Firebase Auth and exposes {user, loading} to children.
- */
-export default function AuthProvider({ children }: { children: ReactNode }) {
-  const [user, setUser] = useState<User | null>(null);
-  const [loading, setLoading] = useState(true);
+const AuthContext = React.createContext<AuthContextValue>({
+  user: null,
+  loading: true,
+  signInWithGoogle: async () => {},
+  signOut: async () => {},
+});
 
-  useEffect(() => {
-    const unsub = onAuthStateChanged(auth, (u) => {
-      setUser(u);
-      setLoading(false);
-    });
-    return () => unsub();
+export default function AuthProvider({ children }: { children: React.ReactNode }) {
+  const [user, setUser] = React.useState<FirebaseUser>(null);
+  const [loading, setLoading] = React.useState(true);
+
+  // Subscribe to auth state on the CLIENT only; never import Firebase on the server.
+  React.useEffect(() => {
+    if (typeof window === 'undefined') return;
+
+    let unsubscribe: (() => void) | undefined;
+
+    (async () => {
+      const [{ getAuth, onAuthStateChanged }, { app }] = await Promise.all([
+        import('firebase/auth'),
+        import('@/lib/firebase.client'),
+      ]);
+
+      const auth = getAuth(app);
+      unsubscribe = onAuthStateChanged(auth, (u) => {
+        setUser(u);
+        setLoading(false);
+      });
+    })();
+
+    return () => {
+      if (unsubscribe) unsubscribe();
+    };
   }, []);
 
-  return <AuthCtx.Provider value={{ user, loading }}>{children}</AuthCtx.Provider>;
+  const signInWithGoogle = React.useCallback(async () => {
+    const [{ getAuth, GoogleAuthProvider, signInWithPopup }, { app }] = await Promise.all([
+      import('firebase/auth'),
+      import('@/lib/firebase.client'),
+    ]);
+    const auth = getAuth(app);
+    await signInWithPopup(auth, new GoogleAuthProvider());
+  }, []);
+
+  const signOut = React.useCallback(async () => {
+    const [{ getAuth, signOut }, { app }] = await Promise.all([
+      import('firebase/auth'),
+      import('@/lib/firebase.client'),
+    ]);
+    await signOut(getAuth(app));
+  }, []);
+
+  const value = React.useMemo<AuthContextValue>(
+    () => ({ user, loading, signInWithGoogle, signOut }),
+    [user, loading, signInWithGoogle, signOut]
+  );
+
+  return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 }
+
+export const useAuth = () => React.useContext(AuthContext);

@@ -1,4 +1,4 @@
-﻿// src/app/api/aliases/upsert/route.ts
+// src/app/api/aliases/upsert/route.ts
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 

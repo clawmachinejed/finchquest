@@ -1,4 +1,4 @@
-﻿// src/app/api/settings/automation/route.ts
+// src/app/api/settings/automation/route.ts
 import type { NextRequest } from "next/server";
 import { NextResponse } from "next/server";
 import { AdminDb } from "@/lib/firebase.admin";
