@@ -1,3 +1,2 @@
-'use client';
-
-export { getDb, getAuthClient, onAuthChanged, signInWithGooglePopup, db, auth } from './firebase.client';
+// src/lib/firebase.ts
+export * from './firebase.client';

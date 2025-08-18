@@ -5,7 +5,7 @@ import * as React from "react";
 import { useEffect, useState } from 'react';
 import Modal from '@/components/ui/Modal';
 import { Timestamp, doc, getDoc, updateDoc, serverTimestamp } from 'firebase/firestore';
-import { db } from '@/lib/firebase';
+import { db } from '@/lib/firebase.client';
 import { useAuth } from '@/app/providers/AuthProvider';
 
 type Quest = {

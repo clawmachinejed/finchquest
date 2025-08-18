@@ -1,21 +1,21 @@
-﻿// src/app/(app)/chapters/page.tsx
+// src/app/(app)/chapters/page.tsx
 'use client';
 export const dynamic = 'force-dynamic';
 import { useEffect, useMemo, useState } from 'react';
 import Link from 'next/link';
 import { useSearchParams, useRouter } from 'next/navigation';
 import { collection, doc, getDoc, getDocs, orderBy, query, where } from 'firebase/firestore';
-import type { Task, Chapter, Quest, Domain } from "@/types/models";
+import type { Task, Chapter, Quest as QuestModel } from '@/types/models';
 
 import Protected from '@/components/auth/Protected';
 import { useAuth } from '@/app/providers/AuthProvider';
-import { db } from '@/lib/firebase.client';
+import { getDb } from '@/lib/firebase.client';
 import ChapterEditModal from '@/components/modals/ChapterEditModal';
 import ChapterCreateModal from '@/components/modals/ChapterCreateModal';
 import TaskEditModal from '@/components/modals/TaskEditModal';
 import TaskCreateModal from '@/components/modals/TaskCreateModal';
 
-type Quest = { id: string; title: string; summary?: string };
+const db = getDb();
 
 export default function ChaptersPage() {
   return (
@@ -32,7 +32,7 @@ function ChaptersInner() {
   const router = useRouter();
   const { user } = useAuth();
 
-  const [quest, setQuest] = useState<Quest | null>(null);
+  const [quest, setQuest] = useState<QuestModel | null>(null);
   const [chapters, setChapters] = useState<Chapter[]>([]);
   const [tasksByChapter, setTasksByChapter] = useState<Record<string, Task[]>>({});
   const [loading, setLoading] = useState(true);
@@ -61,8 +61,13 @@ function ChaptersInner() {
         router.replace(backToQuestsHref);
         return;
       }
-      const qd = questSnap.data() as Quest;
-      setQuest({ id: questSnap.id, title: (qd as any).title, summary: (qd as any).summary });
+      const qd = questSnap.data() as any;
+      setQuest({
+        id: questSnap.id,
+        title: qd.title,
+        summary: qd.summary,
+        domainId: qd.domainId,
+      } as QuestModel);
 
       const qCh = query(
         collection(db, 'chapters'),
@@ -96,7 +101,7 @@ function ChaptersInner() {
 
   useEffect(() => {
     reload();
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user, questId]);
 
   const tasksHref = (chapterId: string) => {
@@ -115,15 +120,15 @@ function ChaptersInner() {
         </Link>
       </div>
 
-      <h1 className="mb-1 text-2xl font-bold text-white">{quest ? quest.title : '…'}</h1>
-      <div className="mb-6 flex items-center justify-between">
+      <h1 className="mb-1 text-2xl font-bold text-white">{quest ? quest.title : '—'}</h1>
+      <div className="mb-6 flex items-center justify_between">
         <h2 className="text-lg font-semibold text-zinc-200">Chapters</h2>
         <div className="flex items-center gap-2">
           <button
             onClick={() => setCreateChapterOpen(true)}
             className="inline-flex items-center gap-2 rounded-xl border border-zinc-700 bg-zinc-900/60 px-3 py-1.5 text-sm font-medium text-zinc-100 shadow-sm transition hover:border-zinc-600 hover:bg-zinc-800 active:scale-[0.99]"
           >
-            <span className="text-base leading-none">＋</span>
+            <span className="text-base leading-none">+</span>
             <span>Add</span>
           </button>
         </div>
@@ -155,7 +160,7 @@ function ChaptersInner() {
                   )}
                   <div className="mt-2 text-xs text-zinc-500">
                     {c.status ? <>Status: {c.status}</> : null}
-                    {c.priority ? <>{c.status ? ' · ' : ''}Priority: {c.priority}</> : null}
+                    {c.priority ? <>{c.status ? ' • ' : ''}Priority: {c.priority}</> : null}
                   </div>
                 </div>
 
@@ -182,7 +187,7 @@ function ChaptersInner() {
                         </div>
                         <div className="ml-3 shrink-0 text-xs text-zinc-500">
                           {t.status || ''}
-                          {t.priority ? (t.status ? ' · ' : '') + `prio: ${t.priority}` : ''}
+                          {t.priority ? (t.status ? ' • ' : '') + `prio: ${t.priority}` : ''}
                         </div>
                       </li>
                     ))}

@@ -13,7 +13,7 @@ import {
   query,
   serverTimestamp,
 } from 'firebase/firestore';
-import { db } from '@/lib/firebase';
+import { db } from '@/lib/firebase.client';
 import { useAuth } from '@/app/providers/AuthProvider';
 
 type Domain = { id: string; name: string };

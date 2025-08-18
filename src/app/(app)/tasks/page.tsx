@@ -7,7 +7,7 @@ import { collection, doc, getDoc, getDocs, orderBy, query, where } from 'firebas
 
 import Protected from '@/components/auth/Protected';
 import { useAuth } from '@/app/providers/AuthProvider';
-import { db } from '@/lib/firebase';
+import { db } from '@/lib/firebase.client';
 import TaskEditModal from '@/components/modals/TaskEditModal';
 import TaskCreateModal from '@/components/modals/TaskCreateModal';
 

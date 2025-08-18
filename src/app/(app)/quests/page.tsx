@@ -1,23 +1,24 @@
-﻿// src/app/(app)/quests/page.tsx
+// src/app/(app)/quests/page.tsx
 'use client';
 export const dynamic = 'force-dynamic';
+
 import { useEffect, useMemo, useState } from 'react';
 import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
-import {
-  collection,
-  getDocs,
-  orderBy,
-  query,
-  where,
-  QueryConstraint,
-} from 'firebase/firestore';
-import { db } from '@/lib/firebase.client';
+
+import { collection, getDocs, orderBy, query, where } from 'firebase/firestore';
+import type { QueryConstraint } from 'firebase/firestore';
+
+import type { Quest as QuestModel, Chapter as ChapterModel } from '@/types/models';
+import { getDb } from '@/lib/firebase.client';
 import Protected from '@/components/auth/Protected';
 import { useAuth } from '@/app/providers/AuthProvider';
 import QuestEditModal from '@/components/modals/QuestEditModal';
 import QuestCreateModal from '@/components/modals/QuestCreateModal';
 import DomainFilterBar from '@/components/filters/DomainFilterBar';
+
+// add this line just below the imports:
+const db = getDb();
 
 // simple date formatter (accepts Firestore Timestamp or Date/string)
 const fmtDate = (v: any) => {
@@ -50,8 +51,8 @@ function QuestsInner() {
     return dedupe(csv.split(',').filter(Boolean));
   }, [sp]);
 
-  const [quests, setQuests] = useState<Quest[]>([]);
-  const [chaptersByQuest, setChaptersByQuest] = useState<Record<string, Chapter[]>>({});
+  const [quests, setQuests] = useState<QuestModel[]>([]);
+  const [chaptersByQuest, setChaptersByQuest] = useState<Record<string, ChapterModel[]>>({});
   const [loading, setLoading] = useState(true);
 
   const [editId, setEditId] = useState<string | null>(null);
@@ -62,7 +63,7 @@ function QuestsInner() {
     if (!user) return;
     setLoading(true);
 
-    let questsRows: Quest[] = [];
+    let questsRows: QuestModel[] = [];
 
     const base: QueryConstraint[] = [orderBy('createdAt', 'asc')];
 
@@ -100,7 +101,7 @@ function QuestsInner() {
 
     setQuests(questsRows);
 
-    const map: Record<string, Chapter[]> = {};
+    const map: Record<string, ChapterModel[]> = {};
     for (const quest of questsRows) {
       const cq = query(
         collection(db, 'chapters'),
@@ -109,7 +110,7 @@ function QuestsInner() {
         orderBy('createdAt', 'asc')
       );
       const csnap = await getDocs(cq);
-      const rows: Chapter[] = [];
+      const rows: ChapterModel[] = [];
       csnap.forEach((d) => rows.push({ id: d.id, ...(d.data() as any) }));
       map[quest.id] = rows;
     }
@@ -139,7 +140,7 @@ function QuestsInner() {
       : `Filtered: ${selectedDomains.join(', ')}`;
 
   return (
-    <div className="mx-auto w-full max-w-3xl px-4 py-6 sm:py-8">
+    <div className="mx-auto w_full max-w-3xl px-4 py-6 sm:py-8">
       <div className="mb-2 flex items-center justify-between">
         <h1 className="text-2xl font-bold text-white">Quests</h1>
         <div className="flex items-center gap-2">
@@ -148,7 +149,7 @@ function QuestsInner() {
             className="inline-flex items-center gap-2 rounded-xl border border-zinc-700 bg-zinc-900/60 px-3 py-1.5 text-sm font-medium text-zinc-100 shadow-sm transition hover:border-zinc-600 hover:bg-zinc-800 active:scale-[0.99]"
             aria-label="Add quest"
           >
-            <span className="text-base leading-none">＋</span>
+            <span className="text-base leading-none">+</span>
             <span>Add</span>
           </button>
         </div>
@@ -175,7 +176,7 @@ function QuestsInner() {
                       quest: qst.id,
                       ...(selectedDomains.length === 1 ? { domain: selectedDomains[0] } : {}),
                     }).toString()}`}
-                    className="block truncate text-base font-medium text-white hover:underline"
+                    className="block truncate text-base font-medium text_white hover:underline"
                     title={qst.title}
                   >
                     {qst.title}
@@ -185,10 +186,10 @@ function QuestsInner() {
                   )}
                   <div className="mt-2 text-xs text-zinc-500">
                     {qst.status ? <>Status: {qst.status}</> : null}
-                    {qst.priority ? <>{qst.status ? ' · ' : ''}Priority: {qst.priority}</> : null}
+                    {qst.priority ? <>{qst.status ? ' • ' : ''}Priority: {qst.priority}</> : null}
                     {fmtDate((qst as any).dueDate) ? (
                       <>
-                        {(qst.status || qst.priority) ? ' · ' : ''}Due: {fmtDate((qst as any).dueDate)}
+                        {(qst.status || qst.priority) ? ' • ' : ''}Due: {fmtDate((qst as any).dueDate)}
                       </>
                     ) : null}
                   </div>
@@ -220,7 +221,7 @@ function QuestsInner() {
                         </Link>
                         <span className="ml-3 shrink-0 text-xs text-zinc-500">
                           {ch.status || ''}
-                          {ch.priority ? (ch.status ? ' · ' : '') + `prio: ${ch.priority}` : ''}
+                          {ch.priority ? (ch.status ? ' • ' : '') + `prio: ${ch.priority}` : ''}
                         </span>
                       </li>
                     ))}
