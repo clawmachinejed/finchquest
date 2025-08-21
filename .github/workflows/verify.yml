@@ -1,0 +1,33 @@
+name: Verify
+
+on:
+  pull_request:
+  push:
+    branches:
+      - main
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Use Node.js 20.11.1 (LTS window)
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20.11.1
+          cache: 'pnpm'
+
+      - name: Enable Corepack
+        run: corepack enable
+
+      - name: Pin pnpm (packageManager)
+        run: corepack prepare pnpm@9.6.0 --activate
+
+      - name: Install
+        run: pnpm install --frozen-lockfile
+
+      - name: Verify (types + lint + build + format:check)
+        run: pnpm verify

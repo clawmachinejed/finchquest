@@ -1,20 +1,22 @@
-'use client'
-import * as React from "react";
+'use client';
+import * as React from 'react';
 
-
-import { useState } from 'react'
-import type { Chapter, Status } from '@/lib/types'
-import TasksInline from '@/components/tasks/TasksInline'
+import { useState } from 'react';
+import type { Chapter, Status } from '@/lib/types';
+import TasksInline from '@/components/tasks/TasksInline';
 
 export default function ChapterList(props: {
-  chapters: Chapter[]
-  onUpdate: (id: string, patch: Partial<Pick<Chapter, 'title'|'summary'|'status'>> & { dueDate?: Date | null }) => Promise<void>
-  onDelete: (id: string) => Promise<void>
-  questId: string
-  domainId?: string
-  userId?: string
+  chapters: Chapter[];
+  onUpdate: (
+    id: string,
+    patch: Partial<Pick<Chapter, 'title' | 'summary' | 'status'>> & { dueDate?: Date | null },
+  ) => Promise<void>;
+  onDelete: (id: string) => Promise<void>;
+  questId: string;
+  domainId?: string;
+  userId?: string;
 }) {
-  const { chapters, onUpdate, onDelete, questId, domainId, userId } = props
+  const { chapters, onUpdate, onDelete, questId, domainId, userId } = props;
 
   return (
     <ul className="space-y-3">
@@ -27,36 +29,32 @@ export default function ChapterList(props: {
           </div>
 
           {/* Inline tasks (titles only + quick add) */}
-          <TasksInline
-            userId={userId}
-            chapterId={c.id}
-            questId={questId}
-            domainId={domainId}
-          />
+          <TasksInline userId={userId} chapterId={c.id} questId={questId} domainId={domainId} />
         </li>
       ))}
       {chapters.length === 0 && (
-        <li className="rounded border p-6 text-center text-sm text-gray-500">
-          No chapters yet.
-        </li>
+        <li className="rounded border p-6 text-center text-sm text-gray-500">No chapters yet.</li>
       )}
     </ul>
-  )
+  );
 }
 
 function InlineActions(props: {
-  chapter: Chapter
-  onUpdate: (id: string, patch: Partial<Pick<Chapter, 'title'|'summary'|'status'>> & { dueDate?: Date | null }) => Promise<void>
-  onDelete: (id: string) => Promise<void>
+  chapter: Chapter;
+  onUpdate: (
+    id: string,
+    patch: Partial<Pick<Chapter, 'title' | 'summary' | 'status'>> & { dueDate?: Date | null },
+  ) => Promise<void>;
+  onDelete: (id: string) => Promise<void>;
 }) {
-  const { chapter, onUpdate, onDelete } = props
-  const [editing, setEditing] = useState(false)
-  const [title, setTitle] = useState(chapter.title)
-  const [summary, setSummary] = useState(chapter.summary)
-  const [status, setStatus] = useState<Status>(chapter.status)
+  const { chapter, onUpdate, onDelete } = props;
+  const [editing, setEditing] = useState(false);
+  const [title, setTitle] = useState(chapter.title);
+  const [summary, setSummary] = useState(chapter.summary);
+  const [status, setStatus] = useState<Status>(chapter.status);
   const [dueDate, setDueDate] = useState<string>(
-    chapter.dueDate ? new Date(chapter.dueDate).toISOString().slice(0, 10) : ''
-  )
+    chapter.dueDate ? new Date(chapter.dueDate).toISOString().slice(0, 10) : '',
+  );
 
   async function save() {
     await onUpdate(chapter.id, {
@@ -64,8 +62,8 @@ function InlineActions(props: {
       summary,
       status,
       dueDate: dueDate ? new Date(dueDate) : null,
-    })
-    setEditing(false)
+    });
+    setEditing(false);
   }
 
   if (!editing) {
@@ -81,7 +79,7 @@ function InlineActions(props: {
           Delete
         </button>
       </div>
-    )
+    );
   }
 
   return (
@@ -123,5 +121,5 @@ function InlineActions(props: {
         </button>
       </div>
     </div>
-  )
+  );
 }

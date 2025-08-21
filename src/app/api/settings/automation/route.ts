@@ -1,8 +1,8 @@
 // src/app/api/settings/automation/route.ts
-import type { NextRequest } from "next/server";
-import { NextResponse } from "next/server";
-import { AdminDb } from "@/lib/firebase.admin";
-import { z } from "zod";
+import type { NextRequest } from 'next/server';
+import { NextResponse } from 'next/server';
+import { AdminDb } from '@/lib/firebase.admin';
+import { z } from 'zod';
 
 // Body schema (extend as needed)
 const AutomationSchema = z.object({
@@ -12,8 +12,8 @@ const AutomationSchema = z.object({
 
 // You likely swap this for your real auth in a follow-up pass.
 function requireUid(req: NextRequest): string {
-  const uid = req.headers.get("x-user-id");
-  if (!uid) throw new Error("Missing user id");
+  const uid = req.headers.get('x-user-id');
+  if (!uid) throw new Error('Missing user id');
   return uid;
 }
 

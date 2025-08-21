@@ -6,7 +6,7 @@ import { useEffect, useMemo, useState } from 'react';
 import Link from 'next/link';
 import { useSearchParams, useRouter } from 'next/navigation';
 import { collection, doc, getDoc, getDocs, orderBy, query, where } from 'firebase/firestore';
-import type { Task, Chapter, Quest, Domain } from "@/types/models";
+import type { Task, Chapter, Quest } from '@/types/models';
 
 import Protected from '@/components/auth/Protected';
 import { useAuth } from '@/app/providers/AuthProvider';
@@ -42,7 +42,7 @@ function ChaptersInner() {
   const [editChapterOpen, setEditChapterOpen] = useState(false);
   const [createChapterOpen, setCreateChapterOpen] = useState(false);
 
-  const [editTaskId, setEditTaskId] = useState<string | null>(null);
+  const [editTaskId] = useState<string | null>(null);
   const [editTaskOpen, setEditTaskOpen] = useState(false);
   const [createTaskForChapter, setCreateTaskForChapter] = useState<string | null>(null);
 
@@ -70,7 +70,7 @@ function ChaptersInner() {
         collection(db, 'chapters'),
         where('userId', '==', user.uid),
         where('questId', '==', questId),
-        orderBy('createdAt', 'asc')
+        orderBy('createdAt', 'asc'),
       );
       const snap = await getDocs(qCh);
       const chRows: Chapter[] = [];
@@ -83,7 +83,7 @@ function ChaptersInner() {
           collection(db, 'tasks'),
           where('userId', '==', user.uid),
           where('chapterId', '==', ch.id),
-          orderBy('createdAt', 'asc')
+          orderBy('createdAt', 'asc'),
         );
         const tsnap = await getDocs(qTasks);
         const rows: Task[] = [];
@@ -98,7 +98,6 @@ function ChaptersInner() {
 
   useEffect(() => {
     reload();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user, questId]);
 
   const tasksHref = (chapterId: string) => {
@@ -157,7 +156,11 @@ function ChaptersInner() {
                   )}
                   <div className="mt-2 text-xs text-zinc-500">
                     {(c as any).status ? <>Status: {(c as any).status}</> : null}
-                    {(c as any).priority ? <>{(c as any).status ? ' · ' : ''}Priority: {(c as any).priority}</> : null}
+                    {(c as any).priority ? (
+                      <>
+                        {(c as any).status ? ' · ' : ''}Priority: {(c as any).priority}
+                      </>
+                    ) : null}
                   </div>
                 </div>
 
@@ -184,7 +187,9 @@ function ChaptersInner() {
                         </div>
                         <div className="ml-3 shrink-0 text-xs text-zinc-500">
                           {(t as any).status || ''}
-                          {(t as any).priority ? ((t as any).status ? ' · ' : '') + `prio: ${(t as any).priority}` : ''}
+                          {(t as any).priority
+                            ? ((t as any).status ? ' · ' : '') + `prio: ${(t as any).priority}`
+                            : ''}
                         </div>
                       </li>
                     ))}

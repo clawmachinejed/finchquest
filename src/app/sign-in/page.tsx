@@ -14,7 +14,7 @@ export default function SignInPage() {
 
   return (
     <main className="mx-auto max-w-md p-6">
-      <h1 className="text-2xl font-semibold mb-4">Sign in</h1>
+      <h1 className="mb-4 text-2xl font-semibold">Sign in</h1>
       <button
         className="rounded-md border px-4 py-2 hover:bg-gray-50"
         onClick={() => signInWithGooglePopup()}

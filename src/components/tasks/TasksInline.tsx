@@ -1,42 +1,41 @@
 // src/components/tasks/TasksInline.tsx
-'use client'
-import * as React from "react";
+'use client';
+import * as React from 'react';
 
-
-import { useState } from 'react'
-import { useTasks } from '@/lib/useTasks'
+import { useState } from 'react';
+import { useTasks } from '@/lib/useTasks';
 
 export default function TasksInline(props: {
-  userId?: string
-  chapterId: string
-  questId?: string
-  domainId?: string
+  userId?: string;
+  chapterId: string;
+  questId?: string;
+  domainId?: string;
 }) {
-  const { userId, chapterId } = props
-  const { items, loading, error, create } = useTasks(userId, chapterId)
+  const { userId, chapterId } = props;
+  const { items, loading, error, create } = useTasks(userId, chapterId);
 
-  const [title, setTitle] = useState('')
-  const [busy, setBusy] = useState(false)
-  const [err, setErr] = useState<string>('')
+  const [title, setTitle] = useState('');
+  const [busy, setBusy] = useState(false);
+  const [err, setErr] = useState<string>('');
 
   async function addTask(e: React.FormEvent) {
-    e.preventDefault()
-    if (!title.trim()) return
+    e.preventDefault();
+    if (!title.trim()) return;
     try {
-      setBusy(true)
-      setErr('')
+      setBusy(true);
+      setErr('');
       await create({
         title: title.trim(),
-        notes: undefined,   // hidden for now
-        status: 'todo',     // default
-        dueDate: null,      // default
-        priority: undefined // default (omitted)
-      })
-      setTitle('')
+        notes: undefined, // hidden for now
+        status: 'todo', // default
+        dueDate: null, // default
+        priority: undefined, // default (omitted)
+      });
+      setTitle('');
     } catch (e: any) {
-      setErr(e.message || 'Failed to add task')
+      setErr(e.message || 'Failed to add task');
     } finally {
-      setBusy(false)
+      setBusy(false);
     }
   }
 
@@ -77,5 +76,5 @@ export default function TasksInline(props: {
         </ul>
       )}
     </div>
-  )
+  );
 }

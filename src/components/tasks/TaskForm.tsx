@@ -1,40 +1,43 @@
 // src/components/tasks/TaskForm.tsx
-'use client'
-import * as React from "react";
+'use client';
+import * as React from 'react';
 
+import { useState } from 'react';
+import type { Status } from '@/lib/types';
 
-import { useState } from 'react'
-import type { Status } from '@/lib/types'
-
-const STATUS: Status[] = ['todo', 'doing', 'done', 'blocked']
+const STATUS: Status[] = ['todo', 'doing', 'done', 'blocked'];
 
 export default function TaskForm(props: {
   onCreate: (input: {
-    title: string
-    notes?: string
-    status?: Status
-    dueDate?: Date | null
-    priority?: string
-  }) => Promise<void>
-  disabled?: boolean
+    title: string;
+    notes?: string;
+    status?: Status;
+    dueDate?: Date | null;
+    priority?: string;
+  }) => Promise<void>;
+  disabled?: boolean;
 }) {
-  const { onCreate, disabled } = props
-  const [title, setTitle] = useState('')
-  const [notes, setNotes] = useState('')
-  const [status, setStatus] = useState<Status>('todo')
-  const [dueDate, setDueDate] = useState('')
-  const [priority, setPriority] = useState('')
+  const { onCreate, disabled } = props;
+  const [title, setTitle] = useState('');
+  const [notes, setNotes] = useState('');
+  const [status, setStatus] = useState<Status>('todo');
+  const [dueDate, setDueDate] = useState('');
+  const [priority, setPriority] = useState('');
 
   async function submit(e: React.FormEvent) {
-    e.preventDefault()
+    e.preventDefault();
     await onCreate({
       title,
       notes: notes || undefined,
       status,
       dueDate: dueDate ? new Date(dueDate) : null,
       priority: priority || undefined,
-    })
-    setTitle(''); setNotes(''); setStatus('todo'); setDueDate(''); setPriority('')
+    });
+    setTitle('');
+    setNotes('');
+    setStatus('todo');
+    setDueDate('');
+    setPriority('');
   }
 
   return (
@@ -53,7 +56,11 @@ export default function TaskForm(props: {
           value={status}
           onChange={(e) => setStatus(e.target.value as Status)}
         >
-          {STATUS.map((s) => <option key={s} value={s}>{s}</option>)}
+          {STATUS.map((s) => (
+            <option key={s} value={s}>
+              {s}
+            </option>
+          ))}
         </select>
         <input
           className="w-full rounded-xl border px-3 py-2 sm:col-span-2"
@@ -74,9 +81,13 @@ export default function TaskForm(props: {
           onChange={(e) => setPriority(e.target.value)}
         />
       </div>
-      <button type="submit" disabled={disabled} className="rounded-xl bg-black px-4 py-2 text-white disabled:opacity-50">
+      <button
+        type="submit"
+        disabled={disabled}
+        className="rounded-xl bg-black px-4 py-2 text-white disabled:opacity-50"
+      >
         Add Task
       </button>
     </form>
-  )
+  );
 }

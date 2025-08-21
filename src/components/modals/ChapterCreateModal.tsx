@@ -1,17 +1,9 @@
 'use client';
-import * as React from "react";
-
+import * as React from 'react';
 
 import { useEffect, useState } from 'react';
 import Modal from '@/components/ui/Modal';
-import {
-  Timestamp,
-  addDoc,
-  collection,
-  doc,
-  getDoc,
-  serverTimestamp,
-} from 'firebase/firestore';
+import { Timestamp, addDoc, collection, doc, getDoc, serverTimestamp } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
 import { useAuth } from '@/app/providers/AuthProvider';
 
@@ -76,13 +68,18 @@ export default function ChapterCreateModal({
       setErr(null);
       if (domainId && questId) loadCtx();
     }
-    return () => { alive = false; };
+    return () => {
+      alive = false;
+    };
   }, [open, domainId, questId]);
 
   async function onSave(e: React.FormEvent) {
     e.preventDefault();
     if (!user) return;
-    if (!title.trim()) { setErr('Please provide a title.'); return; }
+    if (!title.trim()) {
+      setErr('Please provide a title.');
+      return;
+    }
     setSaving(true);
     setErr(null);
     try {
@@ -110,7 +107,11 @@ export default function ChapterCreateModal({
   return (
     <Modal open={open} onClose={onClose} title="Add Chapter">
       <form onSubmit={onSave} className="space-y-4">
-        {err && <div className="rounded-lg border border-red-600 bg-red-900/20 p-2 text-red-200">{err}</div>}
+        {err && (
+          <div className="rounded-lg border border-red-600 bg-red-900/20 p-2 text-red-200">
+            {err}
+          </div>
+        )}
 
         {/* Read-only context */}
         <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
@@ -135,43 +136,75 @@ export default function ChapterCreateModal({
         {/* Editable fields */}
         <div>
           <label className="mb-1 block text-sm text-zinc-300">Title</label>
-          <input className="w-full rounded-xl border border-zinc-700 bg-zinc-900 px-3 py-2 text-zinc-100"
-            value={title} onChange={(e) => setTitle(e.target.value)} required />
+          <input
+            className="w-full rounded-xl border border-zinc-700 bg-zinc-900 px-3 py-2 text-zinc-100"
+            value={title}
+            onChange={(e) => setTitle(e.target.value)}
+            required
+          />
         </div>
         <div>
           <label className="mb-1 block text-sm text-zinc-300">Summary</label>
-          <textarea className="w-full rounded-xl border border-zinc-700 bg-zinc-900 px-3 py-2 text-zinc-100" rows={3}
-            value={summary} onChange={(e) => setSummary(e.target.value)} />
+          <textarea
+            className="w-full rounded-xl border border-zinc-700 bg-zinc-900 px-3 py-2 text-zinc-100"
+            rows={3}
+            value={summary}
+            onChange={(e) => setSummary(e.target.value)}
+          />
         </div>
         <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
           <div>
             <label className="mb-1 block text-sm text-zinc-300">Status</label>
-            <select className="w-full rounded-xl border border-zinc-700 bg-zinc-900 px-3 py-2 text-zinc-100"
-              value={status} onChange={(e) => setStatus(e.target.value as any)}>
-              {STATUS.map((s) => <option key={s} value={s}>{s}</option>)}
+            <select
+              className="w-full rounded-xl border border-zinc-700 bg-zinc-900 px-3 py-2 text-zinc-100"
+              value={status}
+              onChange={(e) => setStatus(e.target.value as any)}
+            >
+              {STATUS.map((s) => (
+                <option key={s} value={s}>
+                  {s}
+                </option>
+              ))}
             </select>
           </div>
           <div>
             <label className="mb-1 block text-sm text-zinc-300">Priority</label>
-            <select className="w-full rounded-xl border border-zinc-700 bg-zinc-900 px-3 py-2 text-zinc-100"
-              value={priority} onChange={(e) => setPriority(e.target.value as any)}>
-              {PRIORITY.map((p) => <option key={p} value={p}>{p}</option>)}
+            <select
+              className="w-full rounded-xl border border-zinc-700 bg-zinc-900 px-3 py-2 text-zinc-100"
+              value={priority}
+              onChange={(e) => setPriority(e.target.value as any)}
+            >
+              {PRIORITY.map((p) => (
+                <option key={p} value={p}>
+                  {p}
+                </option>
+              ))}
             </select>
           </div>
           <div>
             <label className="mb-1 block text-sm text-zinc-300">Due date</label>
-            <input type="date" className="w-full rounded-xl border border-zinc-700 bg-zinc-900 px-3 py-2 text-zinc-100"
-              value={dueDate} onChange={(e) => setDueDate(e.target.value)} />
+            <input
+              type="date"
+              className="w-full rounded-xl border border-zinc-700 bg-zinc-900 px-3 py-2 text-zinc-100"
+              value={dueDate}
+              onChange={(e) => setDueDate(e.target.value)}
+            />
           </div>
         </div>
 
         <div className="flex gap-3 pt-2">
-          <button type="submit" disabled={saving}
-            className="rounded-xl border border-zinc-600 bg-zinc-100 px-4 py-2 text-zinc-900 hover:bg-white disabled:opacity-60">
+          <button
+            type="submit"
+            disabled={saving}
+            className="rounded-xl border border-zinc-600 bg-zinc-100 px-4 py-2 text-zinc-900 hover:bg-white disabled:opacity-60"
+          >
             {saving ? 'Creating…' : 'Create'}
           </button>
-          <button type="button" onClick={onClose}
-            className="rounded-xl border border-zinc-700 px-4 py-2 text-zinc-200 hover:border-zinc-600 hover:bg-zinc-800">
+          <button
+            type="button"
+            onClick={onClose}
+            className="rounded-xl border border-zinc-700 px-4 py-2 text-zinc-200 hover:border-zinc-600 hover:bg-zinc-800"
+          >
             Cancel
           </button>
         </div>

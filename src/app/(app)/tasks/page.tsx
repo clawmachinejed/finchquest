@@ -1,107 +1,96 @@
-// src/app/(app)/tasks/page.tsx
-'use client'
-export const dynamic = 'force-dynamic'
+'use client';
+export const dynamic = 'force-dynamic';
 
-import Link from 'next/link'
-import { useSearchParams, useRouter } from 'next/navigation'
-import { useEffect, useMemo, useState } from 'react'
-import {
-  collection,
-  doc,
-  getDoc,
-  getDocs,
-  orderBy,
-  query,
-  where,
-  type QueryConstraint,
-} from 'firebase/firestore'
+import Link from 'next/link';
+import { useSearchParams, useRouter } from 'next/navigation';
+import { useEffect, useMemo, useState } from 'react';
+import { collection, doc, getDoc, getDocs, orderBy, query, where } from 'firebase/firestore';
 
-import Protected from '@/components/auth/Protected'
-import TaskCreateModal from '@/components/modals/TaskCreateModal'
-import TaskEditModal from '@/components/modals/TaskEditModal'
-import useAuth from '@/app/providers/AuthProvider'
-import { getDb } from '@/lib/firebase.client'
+import Protected from '@/components/auth/Protected';
+import TaskCreateModal from '@/components/modals/TaskCreateModal';
+import TaskEditModal from '@/components/modals/TaskEditModal';
+import { useAuth } from '@/app/providers/AuthProvider'; // <-- named import (critical)
+import { db } from '@/lib/firebase';
 
-type Quest = { id: string; title: string; summary?: string; domainId?: string }
-type Chapter = { id: string; title: string; summary?: string; questId?: string }
+type Quest = { id: string; title: string; summary?: string; domainId?: string };
+type Chapter = { id: string; title: string; summary?: string; questId?: string };
 type Task = {
-  id: string
-  title: string
-  notes?: string
-  status?: 'todo' | 'doing' | 'done' | 'blocked'
-  priority?: 'low' | 'medium' | 'high'
-  chapterId: string
-  userId: string
-  createdAt?: unknown
-  updatedAt?: unknown
-  dueDate?: number | null
-}
+  id: string;
+  title: string;
+  notes?: string;
+  status?: 'todo' | 'doing' | 'done' | 'blocked';
+  priority?: 'low' | 'medium' | 'high';
+  chapterId: string;
+  userId: string;
+  createdAt?: unknown;
+  updatedAt?: unknown;
+  dueDate?: number | null;
+};
 
 export default function TasksPage() {
   return (
     <Protected>
       <TasksInner />
     </Protected>
-  )
+  );
 }
 
 function TasksInner() {
-  const sp = useSearchParams()
-  const chapterId = sp.get('chapter') ?? ''
-  const questId = sp.get('quest') ?? ''
-  const domainId = sp.get('domain') ?? ''
-  const router = useRouter()
-  const { user } = useAuth()
-  const db = getDb()
+  const sp = useSearchParams();
+  const chapterId = sp.get('chapter') ?? '';
+  const questId = sp.get('quest') ?? '';
+  const domainId = sp.get('domain') ?? '';
+  const router = useRouter();
+  const { user } = useAuth(); // <-- hook call (no args)
 
-  const [quest, setQuest] = useState<Quest | null>(null)
-  const [chapter, setChapter] = useState<Chapter | null>(null)
-  const [tasks, setTasks] = useState<Task[]>([])
-  const [loading, setLoading] = useState(true)
+  const [quest, setQuest] = useState<Quest | null>(null);
+  const [chapter, setChapter] = useState<Chapter | null>(null);
+  const [tasks, setTasks] = useState<Task[]>([]);
+  const [loading, setLoading] = useState(true);
 
-  const [editId, setEditId] = useState<string | null>(null)
-  const [editOpen, setEditOpen] = useState(false)
-  const [createOpen, setCreateOpen] = useState(false)
+  const [editId, setEditId] = useState<string | null>(null);
+  const [editOpen, setEditOpen] = useState(false);
+  const [createOpen, setCreateOpen] = useState(false);
 
   const backToChaptersHref = useMemo(() => {
-    const p = new URLSearchParams()
-    if (questId) p.set('quest', questId)
-    if (domainId) p.set('domain', domainId)
-    return `/chapters?${p.toString()}`
-  }, [questId, domainId])
+    const p = new URLSearchParams();
+    if (questId) p.set('quest', questId);
+    if (domainId) p.set('domain', domainId);
+    return `/chapters?${p.toString()}`;
+  }, [questId, domainId]);
 
   const reload = async () => {
-    if (!user || !chapterId) return
-    setLoading(true)
+    if (!user || !chapterId) return;
+    setLoading(true);
     try {
       // Load chapter
-      const chRef = doc(db, 'chapters', chapterId)
-      const chSnap = await getDoc(chRef)
+      const chRef = doc(db, 'chapters', chapterId);
+      const chSnap = await getDoc(chRef);
       if (!chSnap.exists()) {
-        router.replace(backToChaptersHref)
-        return
+        router.replace(backToChaptersHref);
+        return;
       }
-      const chd = chSnap.data() as Partial<Chapter>
+      const chd = chSnap.data() as Partial<Chapter>;
       setChapter({
         id: chSnap.id,
         title: String(chd.title ?? ''),
         summary: chd.summary,
         questId: chd.questId,
-      })
+      });
 
       // Load quest (from param or from chapter)
-      const qId = questId || chd.questId || ''
+      const qId = questId || chd.questId || '';
       if (qId) {
-        const qRef = doc(db, 'quests', qId)
-        const qSnap = await getDoc(qRef)
+        const qRef = doc(db, 'quests', qId);
+        const qSnap = await getDoc(qRef);
         if (qSnap.exists()) {
-          const qd = qSnap.data() as Partial<Quest>
+          const qd = qSnap.data() as Partial<Quest>;
           setQuest({
             id: qSnap.id,
             title: String(qd.title ?? ''),
             summary: qd.summary,
             domainId: qd.domainId,
-          })
+          });
         }
       }
 
@@ -110,21 +99,20 @@ function TasksInner() {
         collection(db, 'tasks'),
         where('userId', '==', user.uid),
         where('chapterId', '==', chapterId),
-        orderBy('createdAt', 'asc')
-      )
-      const snap = await getDocs(qTasks)
-      const rows: Task[] = []
-      snap.forEach(d => rows.push({ ...(d.data() as Task), id: d.id }))
-      setTasks(rows)
+        orderBy('createdAt', 'asc'),
+      );
+      const snap = await getDocs(qTasks);
+      const rows: Task[] = [];
+      snap.forEach((d) => rows.push({ ...(d.data() as Task), id: d.id }));
+      setTasks(rows);
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
-  }
+  };
 
   useEffect(() => {
-    reload()
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [user, chapterId])
+    reload();
+  }, [user, chapterId]);
 
   return (
     <div className="mx-auto w-full max-w-3xl px-4 py-6 sm:py-8">
@@ -156,7 +144,7 @@ function TasksInner() {
         <div className="rounded-2xl border border-zinc-800 p-6 text-zinc-400">No tasks yet.</div>
       ) : (
         <ul className="space-y-3">
-          {tasks.map(t => (
+          {tasks.map((t) => (
             <li
               key={t.id}
               className="flex items-start justify-between gap-4 rounded-2xl border border-zinc-800 bg-zinc-900/40 p-4 hover:border-zinc-700"
@@ -168,14 +156,18 @@ function TasksInner() {
                 {t.notes && <p className="mt-1 line-clamp-2 text-sm text-zinc-400">{t.notes}</p>}
                 <div className="mt-2 text-xs text-zinc-500">
                   {t.status ? <>Status: {t.status}</> : null}
-                  {t.priority ? <>{t.status ? ' · ' : ''}Priority: {t.priority}</> : null}
+                  {t.priority ? (
+                    <>
+                      {t.status ? ' · ' : ''}Priority: {t.priority}
+                    </>
+                  ) : null}
                 </div>
               </div>
               <div className="shrink-0">
                 <button
                   onClick={() => {
-                    setEditId(t.id)
-                    setEditOpen(true)
+                    setEditId(t.id);
+                    setEditOpen(true);
                   }}
                   className="rounded-xl border border-zinc-700 px-3 py-1.5 text-sm text-zinc-200 hover:border-zinc-600 hover:bg-zinc-800"
                 >
@@ -188,7 +180,12 @@ function TasksInner() {
       )}
 
       {/* Modals */}
-      <TaskEditModal taskId={editId} open={editOpen} onClose={() => setEditOpen(false)} onSaved={reload} />
+      <TaskEditModal
+        taskId={editId}
+        open={editOpen}
+        onClose={() => setEditOpen(false)}
+        onSaved={reload}
+      />
       <TaskCreateModal
         open={createOpen}
         onClose={() => setCreateOpen(false)}
@@ -198,5 +195,5 @@ function TasksInner() {
         domainId={domainId || null}
       />
     </div>
-  )
+  );
 }

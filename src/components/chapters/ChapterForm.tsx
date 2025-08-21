@@ -1,34 +1,39 @@
 // src/components/chapters/ChapterForm.tsx
-'use client'
-import * as React from "react";
+'use client';
+import * as React from 'react';
 
-import { useState } from 'react'
-import type { Status } from '@/lib/types'
+import { useState } from 'react';
+import type { Status } from '@/lib/types';
 
-const STATUS: Status[] = ['todo', 'doing', 'done', 'blocked']
+const STATUS: Status[] = ['todo', 'doing', 'done', 'blocked'];
 
 export default function ChapterForm(props: {
-  onCreate: (input: { title: string; summary?: string; status?: Status; dueDate?: Date | null }) => Promise<void>
-  disabled?: boolean
+  onCreate: (input: {
+    title: string;
+    summary?: string;
+    status?: Status;
+    dueDate?: Date | null;
+  }) => Promise<void>;
+  disabled?: boolean;
 }) {
-  const { onCreate, disabled } = props
-  const [title, setTitle] = useState('')
-  const [summary, setSummary] = useState('')
-  const [status, setStatus] = useState<Status>('todo')
-  const [dueDate, setDueDate] = useState<string>('')
+  const { onCreate, disabled } = props;
+  const [title, setTitle] = useState('');
+  const [summary, setSummary] = useState('');
+  const [status, setStatus] = useState<Status>('todo');
+  const [dueDate, setDueDate] = useState<string>('');
 
   async function submit(e: React.FormEvent) {
-    e.preventDefault()
+    e.preventDefault();
     await onCreate({
       title,
       summary: summary || undefined,
       status,
       dueDate: dueDate ? new Date(dueDate) : null,
-    })
-    setTitle('')
-    setSummary('')
-    setStatus('todo')
-    setDueDate('')
+    });
+    setTitle('');
+    setSummary('');
+    setStatus('todo');
+    setDueDate('');
   }
 
   return (
@@ -48,7 +53,9 @@ export default function ChapterForm(props: {
           onChange={(e) => setStatus(e.target.value as Status)}
         >
           {STATUS.map((s) => (
-            <option key={s} value={s}>{s}</option>
+            <option key={s} value={s}>
+              {s}
+            </option>
           ))}
         </select>
         <input
@@ -72,5 +79,5 @@ export default function ChapterForm(props: {
         Add Chapter
       </button>
     </form>
-  )
+  );
 }

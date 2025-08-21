@@ -1,0 +1,3 @@
+#!/usr/bin/env sh
+# husky v9+ — do not source husky.sh
+pnpm exec lint-staged

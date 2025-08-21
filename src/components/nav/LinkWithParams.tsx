@@ -1,14 +1,13 @@
-// src/components/nav/LinkWithParams.tsx
 'use client';
 
-import NextLink, { type LinkProps as NextLinkOptions } from "next/link";
-import { usePathname, useSearchParams } from "next/navigation";
-import type { AnchorHTMLAttributes, MouseEvent, PropsWithChildren } from "react";
+import NextLink, { type LinkProps as NextLinkOptions } from 'next/link';
+import { useSearchParams } from 'next/navigation';
+import type { AnchorHTMLAttributes, MouseEvent, PropsWithChildren } from 'react';
 
-type CarryKey = "domain";
+type CarryKey = 'domain';
 
 type LinkProps = PropsWithChildren &
-  Omit<AnchorHTMLAttributes<HTMLAnchorElement>, "href"> & // allow onClick, etc.
+  Omit<AnchorHTMLAttributes<HTMLAnchorElement>, 'href'> & // allow onClick, etc.
   NextLinkOptions & {
     href: string;
     carry?: CarryKey[];
@@ -28,10 +27,10 @@ export default function LinkWithParams({
 }: LinkProps) {
   const params = useSearchParams();
 
-  const p = new URLSearchParams(params?.toString() ?? "");
-  if (carry?.includes("domain") && !("domain" in (query ?? {}))) {
-    const d = params?.get("domain");
-    if (d) p.set("domain", d);
+  const p = new URLSearchParams(params?.toString() ?? '');
+  if (carry?.includes('domain') && !('domain' in (query ?? {}))) {
+    const d = params?.get('domain');
+    if (d) p.set('domain', d);
   }
   if (query) {
     for (const [k, v] of Object.entries(query)) {
@@ -40,16 +39,11 @@ export default function LinkWithParams({
     }
   }
 
-  const fullHref = `${href}${p.toString() ? `?${p.toString()}` : ""}`;
+  const fullHref = `${href}${p.toString() ? `?${p.toString()}` : ''}`;
 
   if (disabled) {
     return (
-      <a
-        aria-disabled="true"
-        onClick={(e) => e.preventDefault()}
-        {...rest}
-        href={fullHref}
-      >
+      <a aria-disabled="true" onClick={(e) => e.preventDefault()} {...rest} href={fullHref}>
         {children}
       </a>
     );

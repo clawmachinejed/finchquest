@@ -11,6 +11,6 @@ const nextConfig = {
   // We'll set back to false by Batch F.
   typescript: { ignoreBuildErrors: true },
 
-  serverExternalPackages: ["firebase-admin"]
+  serverExternalPackages: ['firebase-admin'],
 };
 module.exports = nextConfig;

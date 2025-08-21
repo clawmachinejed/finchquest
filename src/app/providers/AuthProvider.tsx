@@ -1,44 +1,58 @@
-// src/app/providers/AuthProvider.tsx
 'use client';
 
-import * as React from 'react';
-import type { ReactNode } from 'react';
-import { onAuthStateChanged, type User as FirebaseUser } from 'firebase/auth';
-import { getAuthClient } from '@/lib/firebase.client';
+import { createContext, useContext, useEffect, useMemo, useState, type ReactNode } from 'react';
+import {
+  onAuthStateChanged,
+  signInWithPopup,
+  GoogleAuthProvider,
+  signOut,
+  type User,
+} from 'firebase/auth';
 
-// Context shape
-type AuthContextValue = {
-  user: FirebaseUser | null;
+import { auth } from '@/lib/firebase';
+
+export type AuthContextValue = {
+  user: User | null;
   loading: boolean;
+  signInWithGoogle: () => Promise<void>;
+  signOutUser: () => Promise<void>;
 };
 
-// Create context
-const AuthContext = React.createContext<AuthContextValue | undefined>(undefined);
+const AuthContext = createContext<AuthContextValue | null>(null);
 
-// Named export: Provider component (used in app/layout.tsx)
-export function AuthProvider({ children }: { children: ReactNode }) {
-  const [user, setUser] = React.useState<FirebaseUser | null>(null);
-  const [loading, setLoading] = React.useState(true);
+function AuthProvider({ children }: { children: ReactNode }) {
+  const [user, setUser] = useState<User | null>(null);
+  const [loading, setLoading] = useState(true);
 
-  React.useEffect(() => {
-    const auth = getAuthClient();
+  useEffect(() => {
     const unsub = onAuthStateChanged(auth, (u) => {
       setUser(u);
       setLoading(false);
     });
-    return unsub;
+    return () => unsub();
   }, []);
 
-  const value = React.useMemo(() => ({ user, loading }), [user, loading]);
+  const value = useMemo<AuthContextValue>(() => {
+    const signInWithGoogle = async () => {
+      const provider = new GoogleAuthProvider();
+      await signInWithPopup(auth, provider);
+    };
+    const signOutUser = async () => {
+      await signOut(auth);
+    };
+    return { user, loading, signInWithGoogle, signOutUser };
+  }, [user, loading]);
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 }
 
-// Default export: hook (so pages can `import useAuth from ...`)
-export default function useAuth(): AuthContextValue {
-  const ctx = React.useContext(AuthContext);
+/** Named hook so callers can `import { useAuth } from '@/app/providers/AuthProvider'` */
+export function useAuth(): AuthContextValue {
+  const ctx = useContext(AuthContext);
   if (!ctx) {
     throw new Error('useAuth must be used within <AuthProvider>');
   }
   return ctx;
 }
+
+export default AuthProvider;

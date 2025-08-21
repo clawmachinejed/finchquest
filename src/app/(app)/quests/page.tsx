@@ -5,13 +5,7 @@ export const dynamic = 'force-dynamic';
 import { useEffect, useMemo, useState } from 'react';
 import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
-import {
-  collection,
-  getDocs,
-  orderBy,
-  query,
-  where,
-} from 'firebase/firestore';
+import { collection, getDocs, orderBy, query, where } from 'firebase/firestore';
 import type { QueryConstraint } from 'firebase/firestore';
 import { db } from '@/lib/firebase.client';
 import Protected from '@/components/auth/Protected';
@@ -77,7 +71,7 @@ function QuestsInner() {
         collection(db, 'quests'),
         where('userId', '==', user.uid),
         where('domainId', '==', selectedDomains[0]),
-        ...base
+        ...base,
       );
       const snap = await getDocs(qRef);
       snap.forEach((d) => questsRows.push({ id: d.id, ...(d.data() as any) }));
@@ -89,13 +83,13 @@ function QuestsInner() {
               collection(db, 'quests'),
               where('userId', '==', user.uid),
               where('domainId', '==', dom),
-              ...base
-            )
-          )
-        )
+              ...base,
+            ),
+          ),
+        ),
       );
       questsRows = dedupeById(
-        snaps.flatMap((s) => s.docs.map((d) => ({ id: d.id, ...(d.data() as any) })))
+        snaps.flatMap((s) => s.docs.map((d) => ({ id: d.id, ...(d.data() as any) }))),
       );
       questsRows.sort((a, b) => ts((a as any).createdAt) - ts((b as any).createdAt));
     }
@@ -108,7 +102,7 @@ function QuestsInner() {
         collection(db, 'chapters'),
         where('userId', '==', user.uid),
         where('questId', '==', quest.id),
-        orderBy('createdAt', 'asc')
+        orderBy('createdAt', 'asc'),
       );
       const csnap = await getDocs(cq);
       const rows: Chapter[] = [];
@@ -122,7 +116,6 @@ function QuestsInner() {
 
   useEffect(() => {
     reload();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user, selectedDomains.join('|')]);
 
   const tasksHref = (questId: string, chapterId: string) => {
@@ -136,9 +129,7 @@ function QuestsInner() {
   };
 
   const headingNote =
-    selectedDomains.length === 0
-      ? 'Showing all quests'
-      : `Filtered: ${selectedDomains.join(', ')}`;
+    selectedDomains.length === 0 ? 'Showing all quests' : `Filtered: ${selectedDomains.join(', ')}`;
 
   return (
     <div className="mx-auto w-full max-w-3xl px-4 py-6 sm:py-8">
@@ -184,14 +175,21 @@ function QuestsInner() {
                   </Link>
                   {/* summary/status/priority/due shown if present on the doc */}
                   {(qst as any).summary && (
-                    <p className="mt-1 line-clamp-2 text-sm text-zinc-400">{(qst as any).summary}</p>
+                    <p className="mt-1 line-clamp-2 text-sm text-zinc-400">
+                      {(qst as any).summary}
+                    </p>
                   )}
                   <div className="mt-2 text-xs text-zinc-500">
                     {(qst as any).status ? <>Status: {(qst as any).status}</> : null}
-                    {(qst as any).priority ? <>{(qst as any).status ? ' · ' : ''}Priority: {(qst as any).priority}</> : null}
+                    {(qst as any).priority ? (
+                      <>
+                        {(qst as any).status ? ' · ' : ''}Priority: {(qst as any).priority}
+                      </>
+                    ) : null}
                     {fmtDate((qst as any).dueDate) ? (
                       <>
-                        {((qst as any).status || (qst as any).priority) ? ' · ' : ''}Due: {fmtDate((qst as any).dueDate)}
+                        {(qst as any).status || (qst as any).priority ? ' · ' : ''}Due:{' '}
+                        {fmtDate((qst as any).dueDate)}
                       </>
                     ) : null}
                   </div>
@@ -223,7 +221,9 @@ function QuestsInner() {
                         </Link>
                         <span className="ml-3 shrink-0 text-xs text-zinc-500">
                           {(ch as any).status || ''}
-                          {(ch as any).priority ? ((ch as any).status ? ' · ' : '') + `prio: ${(ch as any).priority}` : ''}
+                          {(ch as any).priority
+                            ? ((ch as any).status ? ' · ' : '') + `prio: ${(ch as any).priority}`
+                            : ''}
                         </span>
                       </li>
                     ))}

@@ -17,14 +17,14 @@ async function loadAliases(uid: string, domainKey: string | null) {
   const key = domainKey || 'global';
   const col = collection(db, 'users', uid, 'aliases', key, 'entries');
   const snaps = await getDocs(col);
-  return snaps.docs.map((d) => d.data() as { alias: string; questId: string; chapterId?: string | null; weight?: number });
+  return snaps.docs.map(
+    (d) =>
+      d.data() as { alias: string; questId: string; chapterId?: string | null; weight?: number },
+  );
 }
 
 function toTokens(s: string) {
-  return (s || '')
-    .toLowerCase()
-    .split(/\W+/)
-    .filter(Boolean);
+  return (s || '').toLowerCase().split(/\W+/).filter(Boolean);
 }
 
 /**
@@ -65,7 +65,8 @@ export async function classifyMeeting(input: {
   if (exactQ) return { questId: exactQ.id, score: 0.9, method: 'exact' };
 
   const exactC = chapters.find((c) => (c.title || '').toLowerCase() === t);
-  if (exactC) return { questId: exactC.questId, chapterId: exactC.id, score: 0.95, method: 'exact' };
+  if (exactC)
+    return { questId: exactC.questId, chapterId: exactC.id, score: 0.95, method: 'exact' };
 
   // 2) aliases (domain-scoped then global)
   const scopedAliases = await loadAliases(uid, domainHint ?? null);

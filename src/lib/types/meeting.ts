@@ -13,7 +13,13 @@ export interface MeetingMeta {
   audit?: Array<{
     at: number;
     by?: string | null;
-    action: 'created' | 'classified' | 'attached' | 'reassigned' | 'summary_generated' | 'reprocessed';
+    action:
+      | 'created'
+      | 'classified'
+      | 'attached'
+      | 'reassigned'
+      | 'summary_generated'
+      | 'reprocessed';
     from?: { questId?: string | null; chapterId?: string | null } | null;
     to?: { questId?: string | null; chapterId?: string | null } | null;
     reason?: string | null;
@@ -60,7 +66,7 @@ export interface Meeting {
 // Settings
 export interface AutomationSettings {
   meetingAttachThreshold?: number | null; // default 0.75
-  taskCreateThreshold?: number | null;    // default 0.75
+  taskCreateThreshold?: number | null; // default 0.75
 }
 
 // Alias entry

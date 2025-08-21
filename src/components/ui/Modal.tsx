@@ -118,8 +118,7 @@ export default function Modal(props: ModalProps) {
     if (!visible || !mounted) return;
 
     const focusTarget =
-      initialFocusRef?.current ??
-      (document.getElementById(titleId) as HTMLElement | null);
+      initialFocusRef?.current ?? (document.getElementById(titleId) as HTMLElement | null);
 
     // Use microtask to allow the modal to fully mount before focusing
     queueMicrotask(() => {
@@ -159,10 +158,7 @@ export default function Modal(props: ModalProps) {
 
   // Render portal at the end of <body>
   return createPortal(
-    <div
-      className="fixed inset-0 z-50 flex items-center justify-center"
-      aria-hidden={!visible}
-    >
+    <div className="fixed inset-0 z-50 flex items-center justify-center" aria-hidden={!visible}>
       {/* Backdrop */}
       <div
         className="absolute inset-0 bg-black/60 backdrop-blur-sm"
@@ -205,12 +201,7 @@ export default function Modal(props: ModalProps) {
                 className="inline-flex h-9 w-9 items-center justify-center rounded-md text-zinc-300 hover:bg-white/10 hover:text-white focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-400"
                 aria-label="Close dialog"
               >
-                <svg
-                  viewBox="0 0 20 20"
-                  fill="currentColor"
-                  aria-hidden="true"
-                  className="h-5 w-5"
-                >
+                <svg viewBox="0 0 20 20" fill="currentColor" aria-hidden="true" className="h-5 w-5">
                   <path
                     fillRule="evenodd"
                     d="M10 8.586 3.757 2.343 2.343 3.757 8.586 10l-6.243 6.243 1.414 1.414L10 11.414l6.243 6.243 1.414-1.414L11.414 10l6.243-6.243-1.414-1.414L10 8.586z"

@@ -7,8 +7,7 @@ export default function AppSidebar() {
   const sp = useSearchParams();
   const currentDomain = sp.get('domain');
 
-  const linkBase =
-    'block rounded-lg px-3 py-2 hover:bg-white/5 transition-colors';
+  const linkBase = 'block rounded-lg px-3 py-2 hover:bg-white/5 transition-colors';
   const active = 'bg-white/10 text-white';
 
   const isActive = (d: string) => currentDomain === d;

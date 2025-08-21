@@ -1,0 +1,16 @@
+# Node & build output
+node_modules
+.next
+dist
+out
+build
+coverage
+.vercel
+.turbo
+
+# Generated / local artifacts (don’t format these)
+.tsc.resolved.json
+
+# Lockfiles (keep untouched)
+pnpm-lock.yaml
+package-lock.json

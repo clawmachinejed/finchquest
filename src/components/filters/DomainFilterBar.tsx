@@ -61,18 +61,16 @@ export default function DomainFilterBar() {
   }
 
   return (
-    <div className="sticky top-0 z-10 -mx-4 mb-3 border-b border-white/10 bg-background/80 px-4 py-2 backdrop-blur">
+    <div className="bg-background/80 sticky top-0 z-10 -mx-4 mb-3 border-b border-white/10 px-4 py-2 backdrop-blur">
       <div className="flex flex-wrap items-center gap-2">
         {/* All Quests pill */}
         <button
           type="button"
           aria-pressed={isAll}
           onClick={selectAll}
-          className={[
-            basePill,
-            isAll ? activePill : idlePill,
-            pending ? 'opacity-60' : '',
-          ].join(' ')}
+          className={[basePill, isAll ? activePill : idlePill, pending ? 'opacity-60' : ''].join(
+            ' ',
+          )}
         >
           All Quests
         </button>
@@ -91,8 +89,8 @@ export default function DomainFilterBar() {
                 initial.length === 0 // when "All" (no filter), show idle pills
                   ? idlePill
                   : active
-                  ? activePill
-                  : idlePill,
+                    ? activePill
+                    : idlePill,
                 pending ? 'opacity-60' : '',
               ].join(' ')}
             >
@@ -115,7 +113,5 @@ function dedupe<T>(arr: T[]) {
   return Array.from(new Set(arr));
 }
 function validOnly(arr: string[]): DomainKey[] {
-  return arr.filter((x): x is DomainKey =>
-    ['guild', 'keep', 'forge', 'side'].includes(x),
-  );
+  return arr.filter((x): x is DomainKey => ['guild', 'keep', 'forge', 'side'].includes(x));
 }

@@ -1,6 +1,5 @@
 'use client';
-import * as React from "react";
-
+import * as React from 'react';
 
 import { useEffect, useMemo, useState } from 'react';
 import Modal from '@/components/ui/Modal';
@@ -83,7 +82,7 @@ export default function QuestCreateModal({
 
   const domainPlaceholder = useMemo(
     () => (defaultDomainId ? undefined : 'Select Domain'),
-    [defaultDomainId]
+    [defaultDomainId],
   );
 
   async function onSave(e: React.FormEvent) {
@@ -135,9 +134,7 @@ export default function QuestCreateModal({
             onChange={(e) => setDomainId(e.target.value)}
             disabled={loadingDomains}
           >
-            {!defaultDomainId && (
-              <option value="">{domainPlaceholder || 'Select Domain'}</option>
-            )}
+            {!defaultDomainId && <option value="">{domainPlaceholder || 'Select Domain'}</option>}
             {domains.map((d) => (
               <option key={d.id} value={d.id}>
                 {d.name}

@@ -1,6 +1,5 @@
 'use client';
-import * as React from "react";
-
+import * as React from 'react';
 
 import { useEffect, useState } from 'react';
 import Modal from '@/components/ui/Modal';
@@ -80,9 +79,15 @@ export default function ChapterEditModal({
       try {
         const chRef = doc(db, 'chapters', chapterId);
         const chSnap = await getDoc(chRef);
-        if (!chSnap.exists()) { setErr('Chapter not found.'); return; }
+        if (!chSnap.exists()) {
+          setErr('Chapter not found.');
+          return;
+        }
         const d = chSnap.data() as Chapter;
-        if (d.userId !== user.uid) { setErr('You do not have access to this chapter.'); return; }
+        if (d.userId !== user.uid) {
+          setErr('You do not have access to this chapter.');
+          return;
+        }
 
         if (!alive) return;
 
@@ -92,7 +97,9 @@ export default function ChapterEditModal({
         setPriority((d.priority as any) || 'medium');
         if (d.dueDate?.toDate) {
           const dt = d.dueDate.toDate() as Date;
-          setDueDate(`${dt.getFullYear()}-${String(dt.getMonth()+1).padStart(2,'0')}-${String(dt.getDate()).padStart(2,'0')}`);
+          setDueDate(
+            `${dt.getFullYear()}-${String(dt.getMonth() + 1).padStart(2, '0')}-${String(dt.getDate()).padStart(2, '0')}`,
+          );
         } else setDueDate('');
 
         setCreatedAt(d.createdAt ?? null);
@@ -120,7 +127,9 @@ export default function ChapterEditModal({
 
     if (open) setErr(null);
     loadAll();
-    return () => { alive = false; };
+    return () => {
+      alive = false;
+    };
   }, [open, chapterId, user]);
 
   async function onSave(e: React.FormEvent) {
@@ -154,51 +163,87 @@ export default function ChapterEditModal({
         <div className="text-zinc-400">Loading…</div>
       ) : (
         <form onSubmit={onSave} className="space-y-4">
-          {err && <div className="rounded-lg border border-red-600 bg-red-900/20 p-2 text-red-200">{err}</div>}
+          {err && (
+            <div className="rounded-lg border border-red-600 bg-red-900/20 p-2 text-red-200">
+              {err}
+            </div>
+          )}
 
           {/* Read-only Domain / Quest */}
           <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
             <div>
               <label className="mb-1 block text-sm text-zinc-300">Domain</label>
-              <input className="w-full cursor-not-allowed rounded-xl border border-zinc-700 bg-zinc-900 px-3 py-2 text-zinc-400"
-                value={loadingCtx ? 'Loading…' : domain?.name ?? '—'} readOnly />
+              <input
+                className="w-full cursor-not-allowed rounded-xl border border-zinc-700 bg-zinc-900 px-3 py-2 text-zinc-400"
+                value={loadingCtx ? 'Loading…' : (domain?.name ?? '—')}
+                readOnly
+              />
             </div>
             <div>
               <label className="mb-1 block text-sm text-zinc-300">Quest</label>
-              <input className="w-full cursor-not-allowed rounded-xl border border-zinc-700 bg-zinc-900 px-3 py-2 text-zinc-400"
-                value={loadingCtx ? 'Loading…' : quest?.title ?? '—'} readOnly />
+              <input
+                className="w-full cursor-not-allowed rounded-xl border border-zinc-700 bg-zinc-900 px-3 py-2 text-zinc-400"
+                value={loadingCtx ? 'Loading…' : (quest?.title ?? '—')}
+                readOnly
+              />
             </div>
           </div>
 
           <div>
             <label className="mb-1 block text-sm text-zinc-300">Chapter</label>
-            <input className="w-full rounded-xl border border-zinc-700 bg-zinc-900 px-3 py-2 text-zinc-100"
-              value={title} onChange={(e) => setTitle(e.target.value)} required />
+            <input
+              className="w-full rounded-xl border border-zinc-700 bg-zinc-900 px-3 py-2 text-zinc-100"
+              value={title}
+              onChange={(e) => setTitle(e.target.value)}
+              required
+            />
           </div>
           <div>
             <label className="mb-1 block text-sm text-zinc-300">Summary</label>
-            <textarea className="w-full rounded-xl border border-zinc-700 bg-zinc-900 px-3 py-2 text-zinc-100" rows={4}
-              value={summary} onChange={(e) => setSummary(e.target.value)} />
+            <textarea
+              className="w-full rounded-xl border border-zinc-700 bg-zinc-900 px-3 py-2 text-zinc-100"
+              rows={4}
+              value={summary}
+              onChange={(e) => setSummary(e.target.value)}
+            />
           </div>
           <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
             <div>
               <label className="mb-1 block text-sm text-zinc-300">Status</label>
-              <select className="w-full rounded-xl border border-zinc-700 bg-zinc-900 px-3 py-2 text-zinc-100"
-                value={status} onChange={(e) => setStatus(e.target.value as any)}>
-                {STATUS.map((s) => <option key={s} value={s}>{s}</option>)}
+              <select
+                className="w-full rounded-xl border border-zinc-700 bg-zinc-900 px-3 py-2 text-zinc-100"
+                value={status}
+                onChange={(e) => setStatus(e.target.value as any)}
+              >
+                {STATUS.map((s) => (
+                  <option key={s} value={s}>
+                    {s}
+                  </option>
+                ))}
               </select>
             </div>
             <div>
               <label className="mb-1 block text-sm text-zinc-300">Priority</label>
-              <select className="w-full rounded-xl border border-zinc-700 bg-zinc-900 px-3 py-2 text-zinc-100"
-                value={priority} onChange={(e) => setPriority(e.target.value as any)}>
-                {PRIORITY.map((p) => <option key={p} value={p}>{p}</option>)}
+              <select
+                className="w-full rounded-xl border border-zinc-700 bg-zinc-900 px-3 py-2 text-zinc-100"
+                value={priority}
+                onChange={(e) => setPriority(e.target.value as any)}
+              >
+                {PRIORITY.map((p) => (
+                  <option key={p} value={p}>
+                    {p}
+                  </option>
+                ))}
               </select>
             </div>
             <div>
               <label className="mb-1 block text-sm text-zinc-300">Due date</label>
-              <input type="date" className="w-full rounded-xl border border-zinc-700 bg-zinc-900 px-3 py-2 text-zinc-100"
-                value={dueDate} onChange={(e) => setDueDate(e.target.value)} />
+              <input
+                type="date"
+                className="w-full rounded-xl border border-zinc-700 bg-zinc-900 px-3 py-2 text-zinc-100"
+                value={dueDate}
+                onChange={(e) => setDueDate(e.target.value)}
+              />
             </div>
           </div>
 
@@ -210,12 +255,18 @@ export default function ChapterEditModal({
           </div>
 
           <div className="flex gap-3 pt-2">
-            <button type="submit" disabled={saving}
-              className="rounded-xl border border-zinc-600 bg-zinc-100 px-4 py-2 text-zinc-900 hover:bg-white disabled:opacity-60">
+            <button
+              type="submit"
+              disabled={saving}
+              className="rounded-xl border border-zinc-600 bg-zinc-100 px-4 py-2 text-zinc-900 hover:bg-white disabled:opacity-60"
+            >
               {saving ? 'Saving…' : 'Save'}
             </button>
-            <button type="button" onClick={onClose}
-              className="rounded-xl border border-zinc-700 px-4 py-2 text-zinc-200 hover:border-zinc-600 hover:bg-zinc-800">
+            <button
+              type="button"
+              onClick={onClose}
+              className="rounded-xl border border-zinc-700 px-4 py-2 text-zinc-200 hover:border-zinc-600 hover:bg-zinc-800"
+            >
               Cancel
             </button>
           </div>

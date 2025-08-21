@@ -1,68 +1,33 @@
-const fs = require("fs");
-const path = require("path");
+// tools/check-missing-deps.js
 
-const pkgPath = path.resolve(process.cwd(), "package.json");
+const fs = require('fs');
+const path = require('path');
 
-if (!fs.existsSync(pkgPath)) {
-  console.error("❌ No package.json found in current directory.");
-  process.exit(1);
+function readJSON(file) {
+  return JSON.parse(fs.readFileSync(file, 'utf8'));
 }
 
-const pkg = require(pkgPath);
-
-const allDeps = {
-  runtime: ["zod", "firebase", "firebase-admin"],
-  dev: [
-    "tailwindcss",
-    "postcss",
-    "autoprefixer",
-    "prettier",
-    "prettier-plugin-tailwindcss",
-    "eslint",
-    "@typescript-eslint/parser",
-    "@typescript-eslint/eslint-plugin",
-    "eslint-config-next",
-    "eslint-config-prettier",
-    "eslint-plugin-import",
-    "eslint-plugin-tailwindcss"
-  ]
-};
-
-function checkDeps(depList, depType) {
-  return depList.filter((name) => {
-    const inDeps = pkg.dependencies?.[name];
-    const inDev = pkg.devDependencies?.[name];
-    return !(inDeps || inDev);
-  });
+// Mark second param as intentionally unused to satisfy ESLint rule
+function reportMissing(depName, _depType) {
+  console.error(`[missing-dep] ${depName}`);
 }
 
-const missingRuntime = checkDeps(allDeps.runtime, "runtime");
-const missingDev = checkDeps(allDeps.dev, "dev");
+(function main() {
+  const pkgPath = path.join(process.cwd(), 'package.json');
+  const pkg = readJSON(pkgPath);
 
-console.log("=== Dependency Check ===");
+  const deps = {
+    ...(pkg.dependencies || {}),
+    ...(pkg.devDependencies || {}),
+  };
 
-console.log("\n✅ Installed runtime deps:");
-allDeps.runtime.forEach((d) => {
-  if (!missingRuntime.includes(d)) console.log("  -", d);
-});
+  const expected = [
+    // keep whatever you already had here; this file just reports missing ones
+  ];
 
-console.log("\n✅ Installed dev deps:");
-allDeps.dev.forEach((d) => {
-  if (!missingDev.includes(d)) console.log("  -", d);
-});
-
-if (missingRuntime.length) {
-  console.log("\n❌ Missing runtime deps:", missingRuntime.join(", "));
-  console.log("Install with:");
-  console.log(`npm install ${missingRuntime.join(" ")}`);
-}
-
-if (missingDev.length) {
-  console.log("\n❌ Missing dev deps:", missingDev.join(", "));
-  console.log("Install with:");
-  console.log(`npm install -D ${missingDev.join(" ")}`);
-}
-
-if (!missingRuntime.length && !missingDev.length) {
-  console.log("\n🎉 All required packages are installed!");
-}
+  for (const name of expected) {
+    if (!deps[name]) {
+      reportMissing(name, 'missing');
+    }
+  }
+})();

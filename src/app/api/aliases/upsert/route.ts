@@ -6,10 +6,10 @@ import { NextResponse } from 'next/server';
 import { adminDb, Timestamp } from '@/lib/firebase-server';
 
 type Payload = {
-  userId: string;            // must be the owner
-  domainKey: string;         // 'guild' | 'keep' | 'forge' | 'side'
-  aliasId?: string;          // optional for create
-  value: string;             // alias string
+  userId: string; // must be the owner
+  domainKey: string; // 'guild' | 'keep' | 'forge' | 'side'
+  aliasId?: string; // optional for create
+  value: string; // alias string
 };
 
 export async function POST(req: Request) {
@@ -39,7 +39,7 @@ export async function POST(req: Request) {
         updatedAt: now,
         createdAt: body.aliasId ? undefined : now,
       },
-      { merge: true }
+      { merge: true },
     );
 
     return NextResponse.json({ ok: true, id: docRef.id });
@@ -48,4 +48,3 @@ export async function POST(req: Request) {
     return NextResponse.json({ ok: false, error: 'Internal error' }, { status: 500 });
   }
 }
-
