@@ -1,33 +1,38 @@
 name: Verify
 
 on:
-  pull_request:
   push:
-    branches:
-      - main
+    branches: ['**']
+  pull_request:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: verify-${{ github.ref }}
+  cancel-in-progress: true
 
 jobs:
   verify:
     runs-on: ubuntu-latest
-
     steps:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Use Node.js 20.11.1 (LTS window)
+      - name: Use Node.js 20.11.1 (LTS)
         uses: actions/setup-node@v4
         with:
-          node-version: 20.11.1
+          node-version: '20.11.1'
           cache: 'pnpm'
 
       - name: Enable Corepack
         run: corepack enable
 
-      - name: Pin pnpm (packageManager)
+      - name: Prepare pnpm 9.6.0
         run: corepack prepare pnpm@9.6.0 --activate
 
-      - name: Install
+      - name: Install deps
         run: pnpm install --frozen-lockfile
 
-      - name: Verify (types + lint + build + format:check)
+      - name: Verify (types + lint + build + formatcheck)
         run: pnpm verify
